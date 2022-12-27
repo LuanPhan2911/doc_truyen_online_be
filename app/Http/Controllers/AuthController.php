@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\EmailVerifyNotificationRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -17,14 +18,24 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
     use ResponseTrait;
+    public function user(Request $request)
+    {
+        $user = $request->user();
+        if (empty($user)) {
+            return $this->failure();
+        }
+        return $this->success('ok', [
+            'email' => $user->email,
+        ]);
+    }
     public function register(RegisterRequest $request)
     {
         try {
             $arr = $request->all();
             $arr['password'] = Hash::make($request->password);
             $user = User::create($arr);
-            $data['token'] = $user->createToken('MyApp')->plainTextToken;
-            return $this->success('ok', $data);
+            $token = $user->createToken('MyApp')->plainTextToken;
+            return $this->success('ok', $token);
         } catch (\Throwable $th) {
             return $this->failure('fail');
             //throw $th;
@@ -41,8 +52,10 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            $data['token'] = $user->createToken('authToken')->plainTextToken;
-            return $this->success('ok', $data);
+            $token = $user->createToken('authToken')->plainTextToken;
+            return $this->success('ok', [
+                'token' => $token
+            ]);
         } catch (\Exception $error) {
             return $this->failure('fail');
         }
@@ -51,15 +64,31 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $user = $request->user();
+        Auth::guard('web')->logout();
         $user->tokens()->delete();
         return $this->success(
             'user logout',
+            [
+                // 'user' => $user,
+            ]
         );
     }
 
+    public function emailVerifyNotification(EmailVerifyNotificationRequest $request)
+    {
+        try {
+            $user = $request->user();
+            if (empty($user)) {
+                $user = User::query()->where('email', $request->email)->first();
+            }
+            $user->sendEmailVerificationNotification();
+            return $this->success();
+        } catch (\Throwable $th) {
+            return $this->failure();
+        }
+    }
     public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $request->validate(['email' => 'required|email']);
 
         $status = Password::sendResetLink(
             $request->only('email')
