@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Story;
 use App\Http\Requests\StoreStoryRequest;
 use App\Http\Requests\UpdateStoryRequest;
+use App\Traits\ResponseTrait;
 
 class StoryController extends Controller
 {
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -36,7 +38,19 @@ class StoryController extends Controller
      */
     public function store(StoreStoryRequest $request)
     {
-        //
+        $arr = $request->only([
+            'name',
+            'description',
+            'avatar',
+            'status',
+            'view',
+            'user_id',
+        ]);
+        $genres_id = $request->safe()->genres_id;
+        $story = Story::create($arr);
+        $story->genres()->attach($genres_id);
+
+        return $this->success($story);
     }
 
     /**

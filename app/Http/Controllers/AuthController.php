@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
+use App\Traits\ResponseTrait;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class AuthController extends Controller
         if (empty($user)) {
             return $this->failure();
         }
-        return $this->success('ok', [
+        return $this->success([
             'email' => $user->email,
         ]);
     }
@@ -35,7 +36,7 @@ class AuthController extends Controller
             $arr['password'] = Hash::make($request->password);
             $user = User::create($arr);
             $token = $user->createToken('MyApp')->plainTextToken;
-            return $this->success('ok', $token);
+            return $this->success($token);
         } catch (\Throwable $th) {
             return $this->failure('fail');
             //throw $th;
@@ -53,11 +54,11 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->first();
 
             $token = $user->createToken('authToken')->plainTextToken;
-            return $this->success('ok', [
+            return $this->success([
                 'token' => $token
             ]);
         } catch (\Exception $error) {
-            return $this->failure('fail');
+            return $this->failure();
         }
     }
 
@@ -67,7 +68,6 @@ class AuthController extends Controller
         Auth::guard('web')->logout();
         $user->tokens()->delete();
         return $this->success(
-            'user logout',
             [
                 // 'user' => $user,
             ]

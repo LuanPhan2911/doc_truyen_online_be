@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\StoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,4 +44,17 @@ Route::group([
     'prefix' => 'genre'
 ], function () {
     Route::post('/create', [GenreController::class, 'store']);
+    Route::get('/', [GenreController::class, 'index']);
+});
+Route::group([
+    'prefix' => 'story'
+], function () {
+    Route::post('/create', [StoryController::class, 'store']);
+    Route::get('/', [StoryController::class, 'index']);
+});
+Route::group([
+    'prefix' => 'chapter'
+], function () {
+    Route::post('/create', [ChapterController::class, 'store']);
+    Route::get('/', [ChapterController::class, 'index']);
 });

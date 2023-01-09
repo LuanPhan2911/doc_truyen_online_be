@@ -2,20 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GetGenreRequest;
 use App\Models\Genre;
 use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
+use App\Traits\ResponseTrait;
+use GuzzleHttp\Psr7\Request;
+
+use function PHPUnit\Framework\isEmpty;
 
 class GenreController extends Controller
 {
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(GetGenreRequest $request)
     {
-        //
+        $query = Genre::query()->select(['name', 'id', 'type']);
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+        $arr = $query->get();
+        return $this->success($arr);
     }
 
     /**
@@ -36,7 +47,9 @@ class GenreController extends Controller
      */
     public function store(StoreGenreRequest $request)
     {
-        //
+        $arr = $request->validated();
+        $data = Genre::query()->create($arr);
+        return $this->success($data);
     }
 
     /**

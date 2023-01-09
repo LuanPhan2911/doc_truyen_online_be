@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Traits;
 
 trait ResponseTrait
 {
-    public function success($message = '', $data = [], $status = 200)
+    public function success($data = [], $status = 200)
     {
         return response([
             'success' => true,
             'data' => $data,
-            'message' => $message,
         ], $status);
     }
 
-    public function failure($message = '', $status = 422)
+    public function failure($error = [], $status = 400)
     {
         return response([
             'success' => false,
-            'message' => $message,
+            'error' => $error
         ], $status);
     }
 }

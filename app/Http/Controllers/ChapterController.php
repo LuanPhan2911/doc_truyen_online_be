@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Chapter;
 use App\Http\Requests\StoreChapterRequest;
 use App\Http\Requests\UpdateChapterRequest;
+use App\Traits\ResponseTrait;
 
 class ChapterController extends Controller
 {
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *

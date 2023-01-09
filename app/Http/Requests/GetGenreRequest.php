@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\GenreType;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreChapterRequest extends FormRequest
+class GetGenreRequest extends FormRequest
 {
     use PreventRedirectIfValidateFailed;
-    public $hiddenError = false;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -28,18 +28,10 @@ class StoreChapterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'required'
-            ],
-            'story_id' => [
-                Rule::exists(Story::class, 'id'),
-                'required',
-            ],
-            'index' => [
-                'required',
-            ],
-            'content' => [
-                'required',
+            'type' => [
+                'bail',
+                'nullable',
+                Rule::in(GenreType::getValues()),
             ]
         ];
     }

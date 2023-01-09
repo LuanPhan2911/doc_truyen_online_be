@@ -18,9 +18,8 @@ return new class extends Migration
             $table->string('name', 255);
             $table->text('description');
             $table->string('avatar', 255)->nullable();
-            $table->string('pluck', 255);
-            $table->tinyInteger('status');
-            $table->tinyInteger('props');
+            $table->string('slug', 255);
+            $table->tinyInteger('status')->default(1);
             $table->tinyInteger('view');
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
