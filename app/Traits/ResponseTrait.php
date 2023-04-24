@@ -4,19 +4,15 @@ namespace App\Traits;
 
 trait ResponseTrait
 {
-    public function success($data = [], $status = 200)
+    public function success($response = [], $status = 200)
     {
-        return response([
-            'success' => true,
-            'data' => $data,
-        ], $status);
+        $response['success'] = true;
+        return response($response, $status);
     }
 
-    public function failure($error = [], $status = 400)
+    public function failure($response = [], $status = 400)
     {
-        return response([
-            'success' => false,
-            'error' => $error
-        ], $status);
+        $response['success'] = false;
+        return response($response, $status);
     }
 }

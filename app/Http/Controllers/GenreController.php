@@ -26,7 +26,9 @@ class GenreController extends Controller
             $query->where('type', $request->type);
         }
         $arr = $query->get();
-        return $this->success($arr);
+        return $this->success([
+            'data' => $arr
+        ]);
     }
 
     /**

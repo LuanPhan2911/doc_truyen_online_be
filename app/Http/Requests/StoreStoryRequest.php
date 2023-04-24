@@ -42,6 +42,7 @@ class StoreStoryRequest extends FormRequest
             ],
             'avatar' => [
                 'image',
+                'max:10240'
             ],
             'status' => [
                 'required',

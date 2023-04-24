@@ -13,6 +13,7 @@ use BenSampo\Enum\Enum;
  */
 final class StatusStoryEnum extends Enum
 {
-    public const FINISHING = 1;
-    public const FINISHED = 2;
+    public const NEW = 1;
+    public const RELEASING = 2;
+    public const FINISHED = 3;
 }

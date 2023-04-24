@@ -13,7 +13,7 @@ use BenSampo\Enum\Enum;
  */
 final class ViewStoryEnum extends Enum
 {
-    const MALE = 2;
-    const FEMALE = 3;
-    const OTHER = 1;
+    public const MALE = 1;
+    public const FEMALE = 2;
+    public const OTHER = 3;
 }

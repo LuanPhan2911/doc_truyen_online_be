@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Story;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

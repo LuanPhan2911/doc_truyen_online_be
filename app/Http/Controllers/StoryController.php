@@ -6,6 +6,9 @@ use App\Models\Story;
 use App\Http\Requests\StoreStoryRequest;
 use App\Http\Requests\UpdateStoryRequest;
 use App\Traits\ResponseTrait;
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Storage;
 
 class StoryController extends Controller
 {
@@ -17,7 +20,10 @@ class StoryController extends Controller
      */
     public function index()
     {
-        //
+        $stories = Story::query()->with('user')->get();
+        return $this->success([
+            'data' => $stories,
+        ]);
     }
 
     /**
@@ -27,7 +33,6 @@ class StoryController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -41,16 +46,21 @@ class StoryController extends Controller
         $arr = $request->only([
             'name',
             'description',
-            'avatar',
             'status',
             'view',
-            'user_id',
+            'user_id'
         ]);
         $genres_id = $request->safe()->genres_id;
+        if ($request->hasFile('avatar')) {
+            $path = Storage::putFile('stories', $request->file('avatar'));
+            $arr["avatar"] = $path;
+        }
         $story = Story::create($arr);
         $story->genres()->attach($genres_id);
 
-        return $this->success($story);
+        return $this->success([
+            'data' => $story,
+        ]);
     }
 
     /**
@@ -59,9 +69,16 @@ class StoryController extends Controller
      * @param  \App\Models\Story  $story
      * @return \Illuminate\Http\Response
      */
-    public function show(Story $story)
+    public function show(Request $request)
     {
-        //
+        $name = $request->name;
+        if (!empty($name)) {
+            $story = Story::query()->where("slug", "=", $name)->first();
+            return $this->success([
+                'data' => $story
+            ]);
+            return $this->failure();
+        }
     }
 
     /**

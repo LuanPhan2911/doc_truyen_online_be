@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/get-user', [AuthController::class, 'user'])->middleware('auth:sanctum');
-
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout'])
@@ -51,10 +50,12 @@ Route::group([
 ], function () {
     Route::post('/create', [StoryController::class, 'store']);
     Route::get('/', [StoryController::class, 'index']);
+    Route::get('/{name}', [StoryController::class, 'show']);
 });
 Route::group([
     'prefix' => 'chapter'
 ], function () {
     Route::post('/create', [ChapterController::class, 'store']);
     Route::get('/', [ChapterController::class, 'index']);
+    Route::get('/show', [ChapterController::class, 'show']);
 });

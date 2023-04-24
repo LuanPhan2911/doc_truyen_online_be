@@ -27,6 +27,7 @@ class AuthController extends Controller
         }
         return $this->success([
             'email' => $user->email,
+            'name' => $user->name,
         ]);
     }
     public function register(RegisterRequest $request)
@@ -48,17 +49,26 @@ class AuthController extends Controller
             $credentials = $request->only(['email', 'password']);
 
             if (!Auth::attempt($credentials)) {
-                return $this->failure('not found');
+                return $this->failure([
+                    'error' => [],
+                    'message' => "Email or password not found!"
+                ]);
             }
 
             $user = User::where('email', $request->email)->first();
 
             $token = $user->createToken('authToken')->plainTextToken;
             return $this->success([
-                'token' => $token
+                'token' => $token,
+                'message' => "User login success"
             ]);
         } catch (\Exception $error) {
-            return $this->failure();
+            return $this->failure(
+                [
+                    'error' => $error,
+                    'message' => 'User login fail'
+                ]
+            );
         }
     }
 
@@ -69,7 +79,7 @@ class AuthController extends Controller
         $user->tokens()->delete();
         return $this->success(
             [
-                // 'user' => $user,
+                'message' => "User logout success!"
             ]
         );
     }

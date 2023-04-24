@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Chapter;
 use App\Http\Requests\StoreChapterRequest;
 use App\Http\Requests\UpdateChapterRequest;
+use App\Models\Story;
 use App\Traits\ResponseTrait;
+use Illuminate\Http\Request;
 
 class ChapterController extends Controller
 {
@@ -38,7 +40,11 @@ class ChapterController extends Controller
      */
     public function store(StoreChapterRequest $request)
     {
-        //
+        $arr = $request->all();
+        $chapter = Chapter::create($arr);
+        return $this->success([
+            'data' => $chapter
+        ]);
     }
 
     /**
@@ -47,9 +53,21 @@ class ChapterController extends Controller
      * @param  \App\Models\Chapter  $chapter
      * @return \Illuminate\Http\Response
      */
-    public function show(Chapter $chapter)
+    public function show(Request $request)
     {
-        //
+        $storyId = $request->storyId;
+        $chapterIndex = $request->chapterIndex;
+        if (!empty($storyId) && !empty($chapterIndex)) {
+
+            $chapter = Chapter::query()
+                ->where("index", $chapterIndex)
+                ->where("story_id", $storyId)
+                ->first();;
+            return $this->success([
+                'data' => $chapter
+            ]);
+        }
+        return $this->failure([]);
     }
 
     /**
