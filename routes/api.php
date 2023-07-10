@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/get-user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+Route::get('/get_user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout'])
@@ -35,9 +35,9 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
         200
     );
 })->middleware(['auth:sanctum'])->name('verification.verify');
-Route::post('/email/verification-notification', [AuthController::class, 'emailVerifyNotification']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+Route::post('/email/verification_notification', [AuthController::class, 'emailVerifyNotification']);
+Route::post('/forgot_password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 Route::group([
     'prefix' => 'genre'

@@ -26,8 +26,10 @@ class AuthController extends Controller
             return $this->failure();
         }
         return $this->success([
-            'email' => $user->email,
-            'name' => $user->name,
+            'data' => [
+                'email' => $user->email,
+                'name' => $user->name,
+            ]
         ]);
     }
     public function register(RegisterRequest $request)
@@ -36,10 +38,15 @@ class AuthController extends Controller
             $arr = $request->all();
             $arr['password'] = Hash::make($request->password);
             $user = User::create($arr);
-            $token = $user->createToken('MyApp')->plainTextToken;
-            return $this->success($token);
+            $token = $user->createToken('access_token')->plainTextToken;
+            return $this->success([
+                'token' => $token,
+                'message' => "Register success!",
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ]);
         } catch (\Throwable $th) {
-            return $this->failure('fail');
+            return $this->failure([]);
             //throw $th;
         }
     }
@@ -57,10 +64,12 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            $token = $user->createToken('authToken')->plainTextToken;
+            $token = $user->createToken('access_token')->plainTextToken;
             return $this->success([
                 'token' => $token,
-                'message' => "User login success"
+                'message' => "User login success",
+                'name' => $user->name,
+                'avatar' => $user->avatar,
             ]);
         } catch (\Exception $error) {
             return $this->failure(

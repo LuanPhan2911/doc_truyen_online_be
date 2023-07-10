@@ -20,11 +20,16 @@ class StoryController extends Controller
      */
     public function index()
     {
-        $stories = Story::query()->with('user')->get();
+        $stories = Story::query()->with([
+            "user:id,name,avatar",
+            "genres:name",
+
+        ])->get();
         return $this->success([
             'data' => $stories,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -52,7 +57,7 @@ class StoryController extends Controller
         ]);
         $genres_id = $request->safe()->genres_id;
         if ($request->hasFile('avatar')) {
-            $path = Storage::putFile('stories', $request->file('avatar'));
+            $path = Storage::disk("public")->put('stories', $request->file('avatar'));
             $arr["avatar"] = $path;
         }
         $story = Story::create($arr);

@@ -60,12 +60,17 @@ class ChapterController extends Controller
         if (!empty($storyId) && !empty($chapterIndex)) {
 
             $chapter = Chapter::query()
-                ->where("index", $chapterIndex)
-                ->where("story_id", $storyId)
-                ->first();;
-            return $this->success([
-                'data' => $chapter
-            ]);
+                ->where([
+                    ["index", $chapterIndex],
+                    ["story_id", $storyId]
+                ])
+                ->with('story')
+                ->first();
+            if (!empty($chapter)) {
+                return $this->success([
+                    'data' => $chapter
+                ]);
+            }
         }
         return $this->failure([]);
     }

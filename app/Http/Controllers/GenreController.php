@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GenreType;
 use App\Http\Requests\GetGenreRequest;
 use App\Models\Genre;
 use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
 use App\Traits\ResponseTrait;
+use Faker\Core\Number;
 use GuzzleHttp\Psr7\Request;
 
 use function PHPUnit\Framework\isEmpty;
@@ -21,11 +23,17 @@ class GenreController extends Controller
      */
     public function index(GetGenreRequest $request)
     {
+        $arr = [];
         $query = Genre::query()->select(['name', 'id', 'type']);
         if ($request->has('type')) {
-            $query->where('type', $request->type);
+
+            $type = intval($request->type);
+            $query->where('type', $type);
+            $arr = $query->get();
+        } else {
+            $arr = $query->get();
         }
-        $arr = $query->get();
+
         return $this->success([
             'data' => $arr
         ]);
