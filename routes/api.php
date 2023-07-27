@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
 Route::post('/email/verification_notification', [AuthController::class, 'emailVerifyNotification']);
 Route::post('/forgot_password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('password.reset');
+
+
+Route::post('users/{user}', [UserController::class, "update"]);
+Route::get('users/{user}', [UserController::class, "show"]);
 
 Route::group([
     'prefix' => 'genre'

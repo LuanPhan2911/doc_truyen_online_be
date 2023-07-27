@@ -18,15 +18,34 @@ class StoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $stories = Story::query()->with([
-            "user:id,name,avatar",
-            "genres:name",
+        $stories = [];
+        $query = Story::query()
+            ->with([
+                "user:id,name,avatar",
+                "genres:id,name,type",
 
-        ])->get();
+            ])
+            ->orderBy('updated_at', 'desc');
+        if ($request->has("genres_id")) {
+
+            $genres_id = $request->get("genres_id");
+            $query->whereHas('genres', function ($q) use ($genres_id) {
+                return $q->whereIn('genre_id', $genres_id);
+            });
+        }
+        if ($request->has("name")) {
+            $name = $request->name;
+            $query->where("name", "like", "%" . $name . "%");
+        }
+        if ($request->has("filter")) {
+            $stories =  $query->paginate(10);
+        } else {
+            $stories = $query->limit(8)->get();
+        }
         return $this->success([
-            'data' => $stories,
+            'data' => $stories
         ]);
     }
 

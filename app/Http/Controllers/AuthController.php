@@ -26,10 +26,7 @@ class AuthController extends Controller
             return $this->failure();
         }
         return $this->success([
-            'data' => [
-                'email' => $user->email,
-                'name' => $user->name,
-            ]
+            "data" => $user,
         ]);
     }
     public function register(RegisterRequest $request)
@@ -42,8 +39,7 @@ class AuthController extends Controller
             return $this->success([
                 'token' => $token,
                 'message' => "Register success!",
-                'name' => $user->name,
-                'avatar' => $user->avatar,
+                "data" => $user,
             ]);
         } catch (\Throwable $th) {
             return $this->failure([]);
@@ -68,8 +64,7 @@ class AuthController extends Controller
             return $this->success([
                 'token' => $token,
                 'message' => "User login success",
-                'name' => $user->name,
-                'avatar' => $user->avatar,
+                "data" => $user,
             ]);
         } catch (\Exception $error) {
             return $this->failure(
