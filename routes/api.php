@@ -53,9 +53,10 @@ Route::group([
 Route::group([
     'prefix' => 'story'
 ], function () {
-    Route::post('/create', [StoryController::class, 'store']);
+
     Route::get('/', [StoryController::class, 'index']);
-    Route::get('/{name}', [StoryController::class, 'show']);
+    Route::get('/show/{story}', [StoryController::class, 'show']);
+    Route::get("{story}/chapter", [ChapterController::class, "index"]);
 });
 Route::group([
     'prefix' => 'chapter'
@@ -63,4 +64,12 @@ Route::group([
     Route::post('/create', [ChapterController::class, 'store']);
     Route::get('/', [ChapterController::class, 'index']);
     Route::get('/show', [ChapterController::class, 'show']);
+});
+Route::group([
+    "prefix" => "admin/story"
+], function () {
+    Route::post('/create', [StoryController::class, 'store']);
+    Route::get("/", [StoryController::class, "adminIndex"]);
+    Route::post("/update/{id}", [StoryController::class, "update"]);
+    Route::post("/chapter/create", [ChapterController::class, "store"]);
 });

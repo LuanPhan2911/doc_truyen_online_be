@@ -36,9 +36,7 @@ class StoreChapterRequest extends FormRequest
                 Rule::exists(Story::class, 'id'),
                 'required',
             ],
-            'index' => [
-                'required',
-            ],
+
             'content' => [
                 'required',
             ]

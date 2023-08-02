@@ -35,14 +35,16 @@ class StoreStoryRequest extends FormRequest
         return [
             'name' => [
                 'required',
-                Rule::unique(Story::class, 'name'),
+
             ],
             'description' => [
                 'required'
             ],
             'avatar' => [
+                "nullable",
                 'image',
-                'max:10240'
+                'max:10240',
+
             ],
             'status' => [
                 'required',
@@ -59,6 +61,9 @@ class StoreStoryRequest extends FormRequest
             'genres_id' => [
                 'required',
                 Rule::exists(Genre::class, 'id'),
+            ],
+            "author_name" => [
+                "required"
             ]
         ];
     }

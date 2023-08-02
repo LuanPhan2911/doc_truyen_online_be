@@ -26,8 +26,15 @@ class StoryController extends Controller
                 "user:id,name,avatar",
                 "genres:id,name,type",
 
-            ])
-            ->orderBy('updated_at', 'desc');
+            ]);
+        if ($request->has('orderBy')) {
+            $orderBy = $request->get("orderBy");
+            $query->orderBy("updated_at", $orderBy);
+        } else {
+            $query->orderBy("updated_at", "desc");
+        }
+
+
         if ($request->has("genres_id")) {
 
             $genres_id = $request->get("genres_id");
@@ -72,7 +79,8 @@ class StoryController extends Controller
             'description',
             'status',
             'view',
-            'user_id'
+            'user_id',
+            "author_name",
         ]);
         $genres_id = $request->safe()->genres_id;
         if ($request->hasFile('avatar')) {
@@ -95,14 +103,15 @@ class StoryController extends Controller
      */
     public function show(Request $request)
     {
-        $name = $request->name;
-        if (!empty($name)) {
-            $story = Story::query()->where("slug", "=", $name)->first();
-            return $this->success([
-                'data' => $story
-            ]);
-            return $this->failure();
-        }
+        $id = $request->story;
+        $story = Story::query()->with([
+            "user:id,name",
+            "genres:id,name,type"
+        ])
+            ->find($id);
+        return $this->success([
+            "data" => $story
+        ]);
     }
 
     /**
@@ -123,9 +132,37 @@ class StoryController extends Controller
      * @param  \App\Models\Story  $story
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStoryRequest $request, Story $story)
+    public function update(UpdateStoryRequest $request)
     {
-        //
+        $id = $request->get("id");
+        $story = Story::query()
+            ->with([
+                "user:id,name",
+                "genres:id,name,type"
+            ])
+            ->find($id);
+        $arr = $request->only([
+            "name",
+            "description",
+            "status",
+            "view",
+            "author_name"
+        ]);
+        if ($request->has("genres_id")) {
+            $genres_id = $request->get("genres_id");
+            $story->genres()->sync($genres_id);
+        }
+        if ($request->hasFile("avatar")) {
+            $path = Storage::disk("public")->put('users', $request->file('avatar'));
+            $arr["avatar"] = $path;
+            if (!empty($story->avatar)) {
+                Storage::disk("public")->delete($story->avatar);
+            }
+        }
+        $story->update($arr);
+        return $this->success([
+            "data" => $story,
+        ]);
     }
 
     /**
@@ -137,5 +174,21 @@ class StoryController extends Controller
     public function destroy(Story $story)
     {
         //
+    }
+    public function adminIndex(Request $request)
+    {
+        $userId = $request->get("user_id");
+        $stories = Story::query()
+            ->with([
+                "user:id,name",
+                "genres:id,name,type"
+            ])
+            ->whereHas('user', function ($q) use ($userId) {
+                return $q->whereId($userId);
+            })
+            ->get();
+        return $this->success([
+            "data" => $stories
+        ]);
     }
 }

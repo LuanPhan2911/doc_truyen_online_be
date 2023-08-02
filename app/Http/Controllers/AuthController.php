@@ -50,8 +50,8 @@ class AuthController extends Controller
     {
         try {
             $credentials = $request->only(['email', 'password']);
-
-            if (!Auth::attempt($credentials)) {
+            $rememberMe = $request->get("rememberMe");
+            if (!Auth::attempt($credentials, $rememberMe)) {
                 return $this->failure([
                     'error' => [],
                     'message' => "Email or password not found!"

@@ -17,9 +17,17 @@ class ChapterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($storyId)
     {
-        //
+        $chapters = Chapter::query()
+            ->select(["id", "name", "index", "created_at"])
+            ->where('story_id', $storyId)->get();
+
+        return $this->success(
+            [
+                "data" => $chapters
+            ]
+        );
     }
 
     /**
@@ -40,8 +48,23 @@ class ChapterController extends Controller
      */
     public function store(StoreChapterRequest $request)
     {
-        $arr = $request->all();
+        $index = 1;
+        $storyId = $request->get("story_id");
+        $maxChapterIndex = Chapter::query()->max("index");
+        if (!empty($maxChapterIndex)) {
+            $index = $maxChapterIndex + 1;
+        }
+        $arr = $request->only([
+            "name",
+            "story_id",
+            "content"
+        ]);
+        $arr["index"] = $index;
         $chapter = Chapter::create($arr);
+        if (!empty($chapter)) {
+            $story = Story::query()->find($storyId);
+            $story->touch();
+        }
         return $this->success([
             'data' => $chapter
         ]);

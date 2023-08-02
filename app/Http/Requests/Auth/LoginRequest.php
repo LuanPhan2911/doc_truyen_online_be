@@ -39,6 +39,11 @@ class LoginRequest extends FormRequest
                 'min:1',
                 'required',
             ],
+            "rememberMe" => [
+                "bail",
+                "required",
+
+            ]
         ];
     }
     protected function failedValidation(Validator $validator)
