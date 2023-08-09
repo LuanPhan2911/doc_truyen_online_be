@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,13 +57,13 @@ Route::group([
     Route::get('/', [StoryController::class, 'index']);
     Route::get('/show/{story}', [StoryController::class, 'show']);
     Route::get("{story}/chapter", [ChapterController::class, "index"]);
+    Route::get("{story:slug}/chapter/{chapterIndex}", [ChapterController::class, "show"]);
 });
 Route::group([
     'prefix' => 'chapter'
 ], function () {
     Route::post('/create', [ChapterController::class, 'store']);
     Route::get('/', [ChapterController::class, 'index']);
-    Route::get('/show', [ChapterController::class, 'show']);
 });
 Route::group([
     "prefix" => "admin/story"
@@ -71,5 +71,13 @@ Route::group([
     Route::post('/create', [StoryController::class, 'store']);
     Route::get("/", [StoryController::class, "adminIndex"]);
     Route::post("/update/{id}", [StoryController::class, "update"]);
-    Route::post("/chapter/create", [ChapterController::class, "store"]);
+    Route::post("/{storyId}/chapter/create", [ChapterController::class, "store"]);
+    Route::post("/chapter/{chapterId}", [ChapterController::class, "update"]);
+    Route::get("{story}/chapter/{chapterIndex}", [ChapterController::class, "adminShow"]);
+});
+Route::group([
+    "prefix" => "comments"
+], function () {
+    Route::post("/create", [CommentController::class, "store"]);
+    Route::get("/", [CommentController::class, "index"]);
 });

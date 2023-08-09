@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests;
 
+
 use App\Models\Story;
+use App\Models\User;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateChapterRequest extends FormRequest
+class StoreCommentRequest extends FormRequest
 {
     use PreventRedirectIfValidateFailed;
     /**
@@ -28,16 +30,20 @@ class UpdateChapterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'required'
+            "message" => [
+                "string",
+                "required"
             ],
-            'story_id' => [
-                Rule::exists(Story::class, 'id'),
-                'required',
+            "parent_id" => [
+                "nullable"
             ],
-
-            'content' => [
-                'required',
+            'user_id' => [
+                "required",
+                Rule::exists(User::class, "id")
+            ],
+            "story_id" => [
+                "required",
+                Rule::exists(Story::class, "id"),
             ]
         ];
     }

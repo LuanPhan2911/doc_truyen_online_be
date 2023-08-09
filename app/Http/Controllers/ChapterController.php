@@ -46,20 +46,20 @@ class ChapterController extends Controller
      * @param  \App\Http\Requests\StoreChapterRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreChapterRequest $request)
+    public function store(StoreChapterRequest $request, $storyId)
     {
         $index = 1;
-        $storyId = $request->get("story_id");
-        $maxChapterIndex = Chapter::query()->max("index");
+
+        $maxChapterIndex = Chapter::query()->where("story_id", $storyId)->max("index");
         if (!empty($maxChapterIndex)) {
             $index = $maxChapterIndex + 1;
         }
         $arr = $request->only([
             "name",
-            "story_id",
             "content"
         ]);
         $arr["index"] = $index;
+        $arr["story_id"] = $storyId;
         $chapter = Chapter::create($arr);
         if (!empty($chapter)) {
             $story = Story::query()->find($storyId);
@@ -76,26 +76,49 @@ class ChapterController extends Controller
      * @param  \App\Models\Chapter  $chapter
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show(Story $story, $chapterIndex)
     {
-        $storyId = $request->storyId;
-        $chapterIndex = $request->chapterIndex;
-        if (!empty($storyId) && !empty($chapterIndex)) {
 
-            $chapter = Chapter::query()
-                ->where([
-                    ["index", $chapterIndex],
-                    ["story_id", $storyId]
-                ])
-                ->with('story')
-                ->first();
-            if (!empty($chapter)) {
-                return $this->success([
-                    'data' => $chapter
-                ]);
-            }
-        }
-        return $this->failure([]);
+
+        $storyId = $story->id;
+        $chapter = Chapter::query()
+            ->with("story:id,author_name,name")
+            ->where([
+                ["story_id", $storyId],
+                ["index", $chapterIndex]
+
+            ])->first();
+        $countChapter = Chapter::query()->where("story_id", $storyId)->count();
+        return $this->success([
+            'data' => [
+                "chapter" => $chapter,
+                "count" => $countChapter,
+                "storyId" => $storyId
+            ]
+
+
+        ]);
+    }
+    public function adminShow($storyId, $chapterIndex)
+    {
+
+
+
+        $chapter = Chapter::query()
+            ->with("story:id,author_name,name")
+            ->where([
+                ["story_id", $storyId],
+                ["index", $chapterIndex]
+
+            ])->first();
+
+        return $this->success([
+            'data' => $chapter
+
+
+
+
+        ]);
     }
 
     /**
@@ -116,9 +139,19 @@ class ChapterController extends Controller
      * @param  \App\Models\Chapter  $chapter
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateChapterRequest $request, Chapter $chapter)
+    public function update(UpdateChapterRequest $request, $chapterId)
     {
-        //
+
+        $chapter = Chapter::query()
+            ->find($chapterId);
+        $arr = $request->only([
+            "name",
+            "content",
+        ]);
+        $chapter->update($arr);
+        return $this->success([
+            "data" => $chapter,
+        ]);
     }
 
     /**
