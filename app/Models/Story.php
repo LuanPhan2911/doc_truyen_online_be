@@ -11,6 +11,7 @@ class Story extends Model
     public $guarded = [];
     use Sluggable;
     use HasFactory;
+    protected $with = [];
     public function sluggable(): array
     {
         return [
@@ -23,6 +24,7 @@ class Story extends Model
     {
         return $this->belongsToMany(Genre::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -34,5 +36,9 @@ class Story extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, "commentable");
+    }
+    public function reports()
+    {
+        return $this->morphMany(Report::class, "reportable");
     }
 }

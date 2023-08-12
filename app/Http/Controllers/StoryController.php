@@ -25,11 +25,11 @@ class StoryController extends Controller
         $stories = [];
         $query = Story::query()
             ->with([
-                "user:id,name,avatar",
                 "genres:id,name,type",
-
             ])
             ->withCount("chapters");
+
+
         if ($request->has('orderBy')) {
             $orderBy = $request->get("orderBy");
             $query->orderBy("updated_at", $orderBy);
@@ -112,7 +112,16 @@ class StoryController extends Controller
             "genres:id,name,type",
 
         ])
+            ->withCount("chapters")
             ->find($id);
+        $comments_count = Comment::query()->whereHasMorph(
+            'commentable',
+            [Story::class],
+            function (Builder $query) use ($id) {
+                $query->where('id', $id);
+            }
+        )->count();
+        $story["comments_count"] = $comments_count;
         return $this->success([
             "data" => $story
         ]);
@@ -195,42 +204,4 @@ class StoryController extends Controller
             "data" => $stories
         ]);
     }
-    // public function getComments(Request $request)
-    // {
-    //     $story_id = $request->get("story_id");
-    //     $story = Story::query()
-    //         ->with([
-    //             "chapters:id,story_id"
-    //         ])
-    //         ->find($story_id);
-    //     $chapters_id = $story->chapters->pluck("id");
-    //     $comments = [];
-    //     foreach ($chapters_id as  $chapter_id) {
-    //         $comments_each_chapter = Comment::query()
-    //             ->with([
-    //                 "replies",
-    //                 "user"
-    //             ])
-    //             ->whereHasMorph(
-    //                 'commentable',
-    //                 [Chapter::class],
-    //                 function (Builder $query) use ($chapter_id) {
-    //                     $query->where('id', $chapter_id);
-    //                 }
-    //             )
-    //             ->where([
-    //                 'parent_id' => null
-    //             ])
-    //             ->latest()
-    //             ->get();
-
-    //         foreach ($comments_each_chapter as $comment) {
-    //             $comments[] = $comment;
-    //         }
-    //     }
-
-    //     return $this->success([
-    //         "data" => $comments,
-    //     ]);
-    // }
 }

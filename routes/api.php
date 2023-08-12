@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -55,7 +56,7 @@ Route::group([
 ], function () {
 
     Route::get('/', [StoryController::class, 'index']);
-    Route::get('/show/{story}', [StoryController::class, 'show']);
+    Route::get("/{story}/show", [StoryController::class, 'show']);
     Route::get("{story}/chapter", [ChapterController::class, "index"]);
     Route::get("{story:slug}/chapter/{chapterIndex}", [ChapterController::class, "show"]);
 });
@@ -78,6 +79,14 @@ Route::group([
 Route::group([
     "prefix" => "comments"
 ], function () {
-    Route::post("/create", [CommentController::class, "store"]);
+    Route::post("/create", [CommentController::class, "store"])->middleware('auth:sanctum');
     Route::get("/", [CommentController::class, "index"]);
+    Route::post("/{comment}/like", [CommentController::class, "like"])->middleware('auth:sanctum');
+});
+Route::group([
+    "prefix" => "reports",
+    // "middleware" => "auth:sanctum"
+], function () {
+    Route::post("/create", [ReportController::class, "store"]);
+    Route::get("/", [ReportController::class, "index"]);
 });

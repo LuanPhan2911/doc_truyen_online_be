@@ -2,14 +2,11 @@
 
 namespace App\Http\Requests;
 
-
-use App\Models\Story;
-use App\Models\User;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreCommentRequest extends FormRequest
+class StoreReportRequest extends FormRequest
 {
     use PreventRedirectIfValidateFailed;
     /**
@@ -30,22 +27,19 @@ class StoreCommentRequest extends FormRequest
     public function rules()
     {
         return [
+            "user_id" => [
+                "required",
+                Rule::exists("users", "id"),
+            ],
             "message" => [
                 "string",
+                "required",
+            ],
+            "reportedId" => [
                 "required"
             ],
-            "parent_id" => [
-                "nullable"
-            ],
-            'user_id' => [
-                "required",
-                Rule::exists(User::class, "id")
-            ],
-            "commentedId" => [
-                "required",
-            ],
             "type" => [
-                "required",
+                "required"
             ]
         ];
     }

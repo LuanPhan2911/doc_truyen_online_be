@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
-use App\Models\Chapter;
+
 use App\Models\Story;
 use App\Traits\ResponseTrait;
 
@@ -26,10 +26,12 @@ class CommentController extends Controller
         $comments = Comment::query()
             ->with([
                 "replies" => [
-                    "user"
+                    "user:id,name,avatar"
                 ],
-                "user"
+                "user:id,name,avatar",
+                "likeCounter:id,likeable_id,count"
             ])
+            ->withCount("replies")
             ->whereHasMorph(
                 'commentable',
                 [Story::class],
@@ -41,9 +43,13 @@ class CommentController extends Controller
                 'parent_id' => null
             ])
             ->latest()
-            ->paginate(5);
+            ->cursorPaginate(10);
+
+
         return $this->success([
             "data" => $comments,
+
+
         ]);
     }
 
@@ -69,14 +75,43 @@ class CommentController extends Controller
             "message",
             "user_id"
         ]);
+        $commentedId = $request->get("commentedId");
+        $type = $request->get("type");
         $parent_id = $request->input("parent_id");
-        $story_id = $request->input("story_id");
+
         $comment = new Comment($arr);
         $comment->parent_id = $parent_id;
-        $story = Story::query()->find($story_id);
-        $story->comments()->save($comment);
-        return $this->success([
-            "data" => $comment
+        $morphClass = null;
+        switch ($type) {
+            case 'story':
+                $morphClass = Story::find($commentedId);
+                # code...
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        if (!empty($morphClass)) {
+            $morphClass->comments()->save($comment);
+            $comment->load([
+                "user:id,name,avatar",
+                "likeCounter:id,likeable_id,count"
+            ]);
+            if (!$comment->parent_id) {
+                $comment->load([
+                    "replies" => [
+                        "user:id,name,avatar"
+                    ],
+                ]);
+            }
+            return $this->success([
+                "data" => $comment,
+            ]);
+        }
+
+        return $this->failure([
+            "message" => "MorphClass not found"
         ]);
     }
 
@@ -123,5 +158,19 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         //
+    }
+    public function like(Comment $comment)
+    {
+        $userId = request()->user()->id;
+        if ($comment->liked($userId)) {
+            $comment->unlike($userId);
+            return $this->success([
+                "data" => "unlike"
+            ]);
+        }
+        $comment->like();
+        return $this->success([
+            "data" => "like"
+        ]);
     }
 }
