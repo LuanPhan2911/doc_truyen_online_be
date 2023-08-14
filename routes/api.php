@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\NotifyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
@@ -41,9 +42,15 @@ Route::post('/email/verification_notification', [AuthController::class, 'emailVe
 Route::post('/forgot_password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
+Route::group([
+    "prefix" => "users"
+], function () {
+    Route::get("/notifies/{user}", [UserController::class, "notifies"]);
+    Route::get("/stories/{user}", [UserController::class, "stories"]);
+    Route::post('/{user}', [UserController::class, "update"]);
+    Route::get('/{user}', [UserController::class, "show"]);
+});
 
-Route::post('users/{user}', [UserController::class, "update"]);
-Route::get('users/{user}', [UserController::class, "show"]);
 
 Route::group([
     'prefix' => 'genre'
@@ -82,6 +89,7 @@ Route::group([
     Route::post("/create", [CommentController::class, "store"])->middleware('auth:sanctum');
     Route::get("/", [CommentController::class, "index"]);
     Route::post("/{comment}/like", [CommentController::class, "like"])->middleware('auth:sanctum');
+    Route::delete("{comment}", [CommentController::class, "destroy"]);
 });
 Route::group([
     "prefix" => "reports",
@@ -89,4 +97,10 @@ Route::group([
 ], function () {
     Route::post("/create", [ReportController::class, "store"]);
     Route::get("/", [ReportController::class, "index"]);
+});
+
+Route::group([
+    "prefix" => "notifies"
+], function () {
+    Route::get("/", [NotifyController::class, "index"]);
 });

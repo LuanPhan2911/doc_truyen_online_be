@@ -6,8 +6,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -40,6 +39,45 @@ class UserController extends Controller
 
         return $this->success([
             "data" => $user,
+        ]);
+    }
+    public function stories(User $user)
+    {
+
+        // $user = request()->user();
+        if (!empty($user)) {;
+            $user->load([
+                "stories:id,name,avatar,slug"
+            ]);
+            $stories = $user->stories->loadCount("chapters");
+            return $this->success([
+                "data" => $stories
+            ]);
+        }
+        return $this->failure([
+            "message" => "User not found"
+        ]);
+    }
+    public function notifies(User $user)
+    {
+        if (!empty($user)) {;
+            $user->load([
+                "notifies" => [
+                    "story:id,name,avatar,slug"
+                ]
+            ]);
+            $notifies = $user->notifies;
+            $new_notifies_count = $user->notifies()->count('active', false);
+            return $this->success([
+                "data" => [
+                    "notifies" => $notifies,
+                    "new_notifies_count" => $new_notifies_count
+                ],
+
+            ]);
+        }
+        return $this->failure([
+            "message" => "User not found"
         ]);
     }
 }

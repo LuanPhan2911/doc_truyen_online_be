@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Chapter;
+use App\Models\Story;
+use App\Observers\ChapterObserver;
+use App\Observers\StoryObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,5 +33,7 @@ class AppServiceProvider extends ServiceProvider
             'comment' => 'App\Models\Comment',
             "story" => 'App\Models\Story',
         ]);
+        // Story::observe(StoryObserver::class);
+        Chapter::observe(ChapterObserver::class);
     }
 }

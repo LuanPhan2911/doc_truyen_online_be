@@ -27,7 +27,9 @@ class ReportController extends Controller
             case 'comment':
                 # code...
                 $reports = Report::query()
-                    ->with("reportable")
+                    ->with([
+                        "reportable"
+                    ])
                     ->where("reportable_type", $type)->get();
 
                 break;
@@ -139,6 +141,5 @@ class ReportController extends Controller
      */
     public function destroy(Report $report)
     {
-        //
     }
 }

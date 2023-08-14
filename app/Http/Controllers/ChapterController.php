@@ -81,6 +81,7 @@ class ChapterController extends Controller
 
 
         $storyId = $story->id;
+        $user = request()->user();
         $chapter = Chapter::query()
             ->with("story:id,author_name,name")
             ->where([
@@ -89,6 +90,11 @@ class ChapterController extends Controller
 
             ])->first();
         $countChapter = Chapter::query()->where("story_id", $storyId)->count();
+        if (!empty($user)) {
+            $user->stories()->syncWithoutDetaching([$storyId => [
+                "index" => $chapterIndex,
+            ]]);
+        }
         return $this->success([
             'data' => [
                 "chapter" => $chapter,

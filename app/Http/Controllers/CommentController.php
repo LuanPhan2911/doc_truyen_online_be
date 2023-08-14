@@ -157,7 +157,17 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+        if (!empty($comment)) {
+            $comment->replies()->delete();
+            $comment->reports()->delete();
+            $comment->delete();
+            return $this->success([
+                "message" => "Deleted"
+            ]);
+        }
+        return $this->failure([
+            "message" => "Delete fail"
+        ]);
     }
     public function like(Comment $comment)
     {

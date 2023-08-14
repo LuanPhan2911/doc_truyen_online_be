@@ -52,4 +52,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->morphMany(Report::class, "reportable");
     }
+    public function stories()
+    {
+        return $this->belongsToMany(Story::class)->withPivot([
+            "index", "marked", "notified"
+        ]);
+    }
+    public function notifies()
+    {
+        return $this->hasMany(Notify::class);
+    }
 }

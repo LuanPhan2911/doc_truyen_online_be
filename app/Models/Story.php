@@ -29,6 +29,10 @@ class Story extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot(["index", "notified", "marked"]);
+    }
     public function chapters()
     {
         return $this->hasMany(Chapter::class);
@@ -40,5 +44,9 @@ class Story extends Model
     public function reports()
     {
         return $this->morphMany(Report::class, "reportable");
+    }
+    public function notifies()
+    {
+        return $this->hasMany(Notify::class);
     }
 }

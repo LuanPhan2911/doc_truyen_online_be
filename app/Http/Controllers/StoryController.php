@@ -54,6 +54,7 @@ class StoryController extends Controller
         } else {
             $stories = $query->limit(8)->get();
         }
+
         return $this->success([
             'data' => $stories
         ]);
@@ -121,9 +122,12 @@ class StoryController extends Controller
                 $query->where('id', $id);
             }
         )->count();
-        $story["comments_count"] = $comments_count;
+
+
+        // $story["comments_count"] = $comments_count;
+
         return $this->success([
-            "data" => $story
+            "data" => $story,
         ]);
     }
 
