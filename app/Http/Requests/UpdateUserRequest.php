@@ -30,7 +30,7 @@ class UpdateUserRequest extends FormRequest
             "description" => ["string", "nullable"],
             "gender" => ["boolean", "nullable"],
             "avatar" => ["image",  "max:10240", "nullable"],
-            "birth_date" => ["string", "nullable",]
+            "birth_date" => ["nullable",]
         ];
     }
 }

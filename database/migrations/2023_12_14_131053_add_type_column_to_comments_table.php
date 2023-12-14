@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('stories', function (Blueprint $table) {
-            $table->string("author_name");
+        Schema::table('comments', function (Blueprint $table) {
+            $table->tinyInteger('type')->default(0)->after('message');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('stories', function (Blueprint $table) {
-            $table->dropColumn("author_name");
+        Schema::table('comments', function (Blueprint $table) {
+            $table->dropColumn('type');
         });
     }
 };

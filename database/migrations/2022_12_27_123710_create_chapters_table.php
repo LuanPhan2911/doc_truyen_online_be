@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->foreignId('story_id')->constrained();
+            $table->addColumn('integer', 'index');
             $table->text('content');
             $table->timestamps();
         });

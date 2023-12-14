@@ -81,7 +81,6 @@ class StoryController extends Controller
         $arr = $request->only([
             'name',
             'description',
-            'status',
             'view',
             'user_id',
             "author_name",
@@ -105,27 +104,16 @@ class StoryController extends Controller
      * @param  \App\Models\Story  $story
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show(Request $request, Story $story)
     {
-        $id = $request->story;
-        $story = Story::query()->with([
+        $story->load([
             "user:id,name",
             "genres:id,name,type",
 
         ])
-            ->withCount("chapters")
-            ->find($id);
-        $comments_count = Comment::query()->whereHasMorph(
-            'commentable',
-            [Story::class],
-            function (Builder $query) use ($id) {
-                $query->where('id', $id);
-            }
-        )->count();
+            ->loadCount("chapters");
 
-
-        // $story["comments_count"] = $comments_count;
-
+        $story->append(['comments_count', 'reaction_summary', 'newest_chapter']);
         return $this->success([
             "data" => $story,
         ]);

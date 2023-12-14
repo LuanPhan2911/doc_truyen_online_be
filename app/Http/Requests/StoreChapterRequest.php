@@ -32,11 +32,6 @@ class StoreChapterRequest extends FormRequest
             'name' => [
                 'required'
             ],
-            'story_id' => [
-                Rule::exists(Story::class, 'id'),
-                'required',
-            ],
-
             'content' => [
                 'required',
             ]

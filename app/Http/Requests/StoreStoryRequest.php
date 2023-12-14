@@ -46,10 +46,6 @@ class StoreStoryRequest extends FormRequest
                 'max:10240',
 
             ],
-            'status' => [
-                'required',
-                Rule::in(StatusStoryEnum::getValues())
-            ],
             'view' => [
                 'required',
                 Rule::in(ViewStoryEnum::getValues())

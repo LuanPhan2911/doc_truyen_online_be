@@ -8,10 +8,6 @@ use App\Models\Genre;
 use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
 use App\Traits\ResponseTrait;
-use Faker\Core\Number;
-use GuzzleHttp\Psr7\Request;
-
-use function PHPUnit\Framework\isEmpty;
 
 class GenreController extends Controller
 {
@@ -24,7 +20,7 @@ class GenreController extends Controller
     public function index(GetGenreRequest $request)
     {
         $arr = [];
-        $query = Genre::query()->select(['name', 'id', 'type']);
+        $query = Genre::query()->select(['name', 'id', 'type', 'slug']);
         if ($request->has('type')) {
 
             $type = intval($request->type);
@@ -57,9 +53,15 @@ class GenreController extends Controller
      */
     public function store(StoreGenreRequest $request)
     {
-        $arr = $request->validated();
-        $data = Genre::query()->create($arr);
-        return $this->success($data);
+        $arr = $request->all();
+        $data = [];
+        foreach ($arr as $each) {
+            $genre = Genre::create($each);
+            $data[] = $genre;
+        }
+        return $this->success([
+            "data" => $data
+        ]);
     }
 
     /**
@@ -93,7 +95,13 @@ class GenreController extends Controller
      */
     public function update(UpdateGenreRequest $request, Genre $genre)
     {
-        //
+        $name = $request->get("name");
+        $genre->name = $name;
+
+        $genre->save();
+        return $this->success([
+            "data" => $genre
+        ]);
     }
 
     /**
@@ -104,6 +112,7 @@ class GenreController extends Controller
      */
     public function destroy(Genre $genre)
     {
-        //
+        $genre->delete();
+        return $this->success();
     }
 }

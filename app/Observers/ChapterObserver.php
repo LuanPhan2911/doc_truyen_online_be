@@ -15,16 +15,16 @@ class ChapterObserver
      */
     public function created(Chapter $chapter)
     {
-        $story = Story::find($chapter->story_id);
-        $story->load("users");
-        $users_id = $story->users()->wherePivot("notified", 1)->get()->pluck("id");
-        $collection = collect($users_id)->map(function ($userId) use ($chapter) {
-            return [
-                "user_id" => $userId,
-                "index" => $chapter->index,
-            ];
-        })->toArray();
-        $story->notifies()->createMany($collection);
+        // $story = Story::find($chapter->story_id);
+        // $story->load("users");
+        // $users_id = $story->users()->wherePivot("notified", 1)->get()->pluck("id");
+        // $collection = collect($users_id)->map(function ($userId) use ($chapter) {
+        //     return [
+        //         "user_id" => $userId,
+        //         "index" => $chapter->index,
+        //     ];
+        // })->toArray();
+        // $story->notifies()->createMany($collection);
     }
 
     /**

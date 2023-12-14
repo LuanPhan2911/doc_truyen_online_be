@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('notifies', function (Blueprint $table) {
+        Schema::create('rate_stories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->constrained();
-            $table->foreignId("story_id")->constrained();
-            $table->integer("index");
-            $table->boolean("active")->default(false);
+            $table->foreignId('story_id')->constrained();
+            $table->float('characteristic');
+            $table->float('plot');
+            $table->float('world_building');
+            $table->float('quality_convert');
+            $table->foreignId('comment_id')->constrained();
             $table->timestamps();
         });
     }
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notifies');
+        Schema::dropIfExists('rate_stories');
     }
 };

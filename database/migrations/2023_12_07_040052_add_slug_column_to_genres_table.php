@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string("birth_date")->nullable()->change();
-            $table->boolean("gender")->default(0)->change();
+        Schema::table('genres', function (Blueprint $table) {
+            $table->string('slug');
         });
     }
 
@@ -26,7 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('genres', function (Blueprint $table) {
+            $table->dropColumn(('slug'));
         });
     }
 };

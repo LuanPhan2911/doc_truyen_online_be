@@ -7,6 +7,7 @@ use App\Http\Requests\StoreChapterRequest;
 use App\Http\Requests\UpdateChapterRequest;
 use App\Models\Story;
 use App\Traits\ResponseTrait;
+use DevDojo\LaravelReactions\Models\Reaction;
 use Illuminate\Http\Request;
 
 class ChapterController extends Controller
@@ -17,11 +18,11 @@ class ChapterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($storyId)
+    public function index(Story $story)
     {
         $chapters = Chapter::query()
             ->select(["id", "name", "index", "created_at"])
-            ->where('story_id', $storyId)->get();
+            ->where('story_id', $story?->id)->get();
 
         return $this->success(
             [
@@ -46,11 +47,11 @@ class ChapterController extends Controller
      * @param  \App\Http\Requests\StoreChapterRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreChapterRequest $request, $storyId)
+    public function store(StoreChapterRequest $request, Story $story)
     {
         $index = 1;
 
-        $maxChapterIndex = Chapter::query()->where("story_id", $storyId)->max("index");
+        $maxChapterIndex = Chapter::query()->where("story_id", $story?->id)->max("index");
         if (!empty($maxChapterIndex)) {
             $index = $maxChapterIndex + 1;
         }
@@ -59,10 +60,9 @@ class ChapterController extends Controller
             "content"
         ]);
         $arr["index"] = $index;
-        $arr["story_id"] = $storyId;
+        $arr["story_id"] = $story?->id;
         $chapter = Chapter::create($arr);
         if (!empty($chapter)) {
-            $story = Story::query()->find($storyId);
             $story->touch();
         }
         return $this->success([
@@ -76,52 +76,61 @@ class ChapterController extends Controller
      * @param  \App\Models\Chapter  $chapter
      * @return \Illuminate\Http\Response
      */
-    public function show(Story $story, $chapterIndex)
+    public function adminShow(Story $story, $index)
     {
 
-
-        $storyId = $story->id;
-        $user = request()->user();
         $chapter = Chapter::query()
-            ->with("story:id,author_name,name")
             ->where([
-                ["story_id", $storyId],
-                ["index", $chapterIndex]
-
-            ])->first();
-        $countChapter = Chapter::query()->where("story_id", $storyId)->count();
-        if (!empty($user)) {
-            $user->stories()->syncWithoutDetaching([$storyId => [
-                "index" => $chapterIndex,
-            ]]);
-        }
-        return $this->success([
-            'data' => [
-                "chapter" => $chapter,
-                "count" => $countChapter,
-                "storyId" => $storyId
-            ]
-
-
-        ]);
-    }
-    public function adminShow($storyId, $chapterIndex)
-    {
-
-
-
-        $chapter = Chapter::query()
-            ->with("story:id,author_name,name")
-            ->where([
-                ["story_id", $storyId],
-                ["index", $chapterIndex]
+                ["story_id", $story->id],
+                ["index", $index]
 
             ])->first();
 
         return $this->success([
             'data' => $chapter
+        ]);
+    }
+    public function show(Story $story, $index)
+    {
+        $user = request()->user();
+        $chapter = Chapter::query()
+            ->with([
+                "story:id,author_name,name",
+                "reactions"
+            ])
+            ->where([
+                ["story_id", $story->id],
+                ["index", $index]
 
+            ])->first();
+        $userReaction = null;
+        $countChapter = Chapter::query()->where("story_id", $story->id)->count();
 
+        $reactionSummary = $chapter->getReactionsSummary();
+        if (!empty($user)) {
+            $user->stories()->syncWithoutDetaching([$story->id => [
+                "index" => $index,
+            ]]);
+            if ($chapter->reacted($user)) {
+                foreach ($chapter->reactions as $reaction) {
+                    $responder = $reaction->getResponder();
+                    if ($responder->id === $user->id) {
+                        $userReaction = $reaction;
+                    }
+                };
+            }
+        }
+        $chapter->makeHidden('reactions');
+
+        return $this->success([
+            'data' => [
+                "chapter" => $chapter,
+                "countChapter" => $countChapter,
+                "reaction" => [
+                    'user' => $userReaction,
+                    'summary' => $reactionSummary
+                ]
+            ]
 
 
         ]);
@@ -169,5 +178,29 @@ class ChapterController extends Controller
     public function destroy(Chapter $chapter)
     {
         //
+    }
+
+    public function reaction(Request $request, Story $story, $chapterIndex)
+    {
+        $user = $request->user();
+        if (empty($user)) {
+            return $this->failure();
+        }
+        $reactionName = $request->get('name');
+        $reaction = Reaction::query()->where('name', $reactionName)->first();
+
+        $chapter = Chapter::query()->where([
+            ['story_id', $story->id],
+            ['index', $chapterIndex]
+        ])->first();
+
+        $user->reactTo($chapter, $reaction);
+        $reactionSummary = $chapter->getReactionsSummary();
+        return $this->success([
+            'message' => "Thành công",
+            "data" => [
+                'summary' => $reactionSummary
+            ]
+        ]);
     }
 }

@@ -4,11 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GenreController;
-use App\Http\Controllers\NotifyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,16 +27,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout'])
     ->middleware('auth:sanctum');
 
-Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-
-    return response()->json(
-        [
-            'success' => true
-        ],
-        200
-    );
-})->middleware(['auth:sanctum'])->name('verification.verify');
+Route::get('email/verify/{id}/{hash}', [AuthController::class, 'emailVerifyAccept'])->name('verification.verify');
 Route::post('/email/verification_notification', [AuthController::class, 'emailVerifyNotification']);
 Route::post('/forgot_password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('password.reset');
@@ -56,6 +46,8 @@ Route::group([
     'prefix' => 'genre'
 ], function () {
     Route::post('/create', [GenreController::class, 'store']);
+    Route::post('/edit/{genre}', [GenreController::class, 'update']);
+    Route::delete("/delete/{genre}", [GenreController::class, 'destroy']);
     Route::get('/', [GenreController::class, 'index']);
 });
 Route::group([
@@ -63,9 +55,10 @@ Route::group([
 ], function () {
 
     Route::get('/', [StoryController::class, 'index']);
-    Route::get("/{story}/show", [StoryController::class, 'show']);
-    Route::get("{story}/chapter", [ChapterController::class, "index"]);
-    Route::get("{story:slug}/chapter/{chapterIndex}", [ChapterController::class, "show"]);
+    Route::get("/show/{story:slug}", [StoryController::class, 'show']);
+    Route::get("/{story:slug}/chapter", [ChapterController::class, "index"]);
+    Route::get("/{story:slug}/chapter/{index}", [ChapterController::class, "show"]);
+    Route::post("/{story:slug}/chapter/{index}/reaction", [ChapterController::class, "reaction"]);
 });
 Route::group([
     'prefix' => 'chapter'
@@ -79,9 +72,9 @@ Route::group([
     Route::post('/create', [StoryController::class, 'store']);
     Route::get("/", [StoryController::class, "adminIndex"]);
     Route::post("/update/{id}", [StoryController::class, "update"]);
-    Route::post("/{storyId}/chapter/create", [ChapterController::class, "store"]);
+    Route::post("/{story:slug}/chapter/create", [ChapterController::class, "store"]);
     Route::post("/chapter/{chapterId}", [ChapterController::class, "update"]);
-    Route::get("{story}/chapter/{chapterIndex}", [ChapterController::class, "adminShow"]);
+    Route::get("/{story:slug}/chapter/{index}", [ChapterController::class, "adminShow"]);
 });
 Route::group([
     "prefix" => "comments"
@@ -97,10 +90,4 @@ Route::group([
 ], function () {
     Route::post("/create", [ReportController::class, "store"]);
     Route::get("/", [ReportController::class, "index"]);
-});
-
-Route::group([
-    "prefix" => "notifies"
-], function () {
-    Route::get("/", [NotifyController::class, "index"]);
 });

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId("user_id")->constrained();
             $table->foreignId("story_id")->constrained();
             $table->integer("index");
-            $table->boolean("marked")->default(false);
             $table->boolean("notified")->default(false);
             $table->timestamps();
         });

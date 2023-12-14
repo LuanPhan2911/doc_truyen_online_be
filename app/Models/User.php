@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use DevDojo\LaravelReactions\Traits\Reacts;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Reacts;
 
     /**
      * The attributes that are mass assignable.
@@ -57,9 +58,5 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Story::class)->withPivot([
             "index", "marked", "notified"
         ]);
-    }
-    public function notifies()
-    {
-        return $this->hasMany(Notify::class);
     }
 }

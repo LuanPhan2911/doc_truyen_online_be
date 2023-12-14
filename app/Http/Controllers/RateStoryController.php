@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notify;
-use App\Http\Requests\StoreNotifyRequest;
-use App\Http\Requests\UpdateNotifyRequest;
-use App\Traits\ResponseTrait;
+use App\Models\RateStory;
+use App\Http\Requests\StoreRateStoryRequest;
+use App\Http\Requests\UpdateRateStoryRequest;
 
-class NotifyController extends Controller
+class RateStoryController extends Controller
 {
-    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -17,10 +15,7 @@ class NotifyController extends Controller
      */
     public function index()
     {
-        $notifies = Notify::all();
-        return $this->success([
-            "data" => $notifies,
-        ]);
+        //
     }
 
     /**
@@ -36,10 +31,10 @@ class NotifyController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreNotifyRequest  $request
+     * @param  \App\Http\Requests\StoreRateStoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreNotifyRequest $request)
+    public function store(StoreRateStoryRequest $request)
     {
         //
     }
@@ -47,10 +42,10 @@ class NotifyController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Notify  $notify
+     * @param  \App\Models\RateStory  $rateStory
      * @return \Illuminate\Http\Response
      */
-    public function show(Notify $notify)
+    public function show(RateStory $rateStory)
     {
         //
     }
@@ -58,10 +53,10 @@ class NotifyController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Notify  $notify
+     * @param  \App\Models\RateStory  $rateStory
      * @return \Illuminate\Http\Response
      */
-    public function edit(Notify $notify)
+    public function edit(RateStory $rateStory)
     {
         //
     }
@@ -69,11 +64,11 @@ class NotifyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateNotifyRequest  $request
-     * @param  \App\Models\Notify  $notify
+     * @param  \App\Http\Requests\UpdateRateStoryRequest  $request
+     * @param  \App\Models\RateStory  $rateStory
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateNotifyRequest $request, Notify $notify)
+    public function update(UpdateRateStoryRequest $request, RateStory $rateStory)
     {
         //
     }
@@ -81,10 +76,10 @@ class NotifyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Notify  $notify
+     * @param  \App\Models\RateStory  $rateStory
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Notify $notify)
+    public function destroy(RateStory $rateStory)
     {
         //
     }

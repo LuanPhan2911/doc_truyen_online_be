@@ -3,13 +3,13 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
+    use PreventRedirectIfValidateFailed;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -45,15 +45,5 @@ class RegisterRequest extends FormRequest
                 'same:password'
             ]
         ];
-    }
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json(
-            [
-                'errors' => $validator->errors(),
-                'success' => false,
-            ],
-            400
-        ));
     }
 }

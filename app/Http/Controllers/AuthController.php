@@ -10,6 +10,8 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,9 +37,9 @@ class AuthController extends Controller
             $arr = $request->all();
             $arr['password'] = Hash::make($request->password);
             $user = User::create($arr);
-            $token = $user->createToken('access_token')->plainTextToken;
+
+            event(new Registered($user));
             return $this->success([
-                'token' => $token,
                 'message' => "Register success!",
                 "data" => $user,
             ]);
@@ -100,6 +102,17 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return $this->failure();
         }
+    }
+    public function emailVerifyAccept(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+
+        return response()->json(
+            [
+                'success' => true
+            ],
+            200
+        );
     }
     public function forgotPassword(ForgotPasswordRequest $request)
     {

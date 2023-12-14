@@ -2,10 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\GenreType;
+use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateGenreRequest extends FormRequest
 {
+    public $hiddenError = false;
+    use PreventRedirectIfValidateFailed;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -13,7 +18,7 @@ class UpdateGenreRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +29,9 @@ class UpdateGenreRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => [
+                'required',
+            ],
         ];
     }
 }

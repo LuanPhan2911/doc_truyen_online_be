@@ -30,10 +30,11 @@ class StoreGenreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'required'
+            'name.*' => [
+                'required',
+
             ],
-            'type' => [
+            'type.*' => [
                 'required',
                 Rule::in(GenreType::getValues()),
             ]

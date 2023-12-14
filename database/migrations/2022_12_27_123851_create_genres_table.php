@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->tinyInteger('type');
-            $table->timestamps();
         });
     }
 
