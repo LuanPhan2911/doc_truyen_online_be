@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TypeCommentEnum;
 use App\Models\Comment;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
@@ -11,6 +12,7 @@ use App\Traits\ResponseTrait;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\FuncCall;
 
 class CommentController extends Controller
 {
@@ -23,15 +25,18 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $story_id = $request->get("story_id");
+        $type = $request->get("type") ?? TypeCommentEnum::COMMENT;
         $comments = Comment::query()
             ->with([
                 "replies" => [
                     "user:id,name,avatar"
                 ],
                 "user:id,name,avatar",
-                "likeCounter:id,likeable_id,count"
+                "likeCounter:id,likeable_id,count",
+                "rateStory:comment_id,plot,world_building,quality_convert,characteristic"
             ])
             ->withCount("replies")
+            ->whereType($type)
             ->whereHasMorph(
                 'commentable',
                 [Story::class],
@@ -73,16 +78,18 @@ class CommentController extends Controller
     {
         $arr = $request->only([
             "message",
-            "user_id"
+            "user_id",
+            'is_leak',
+            'type'
         ]);
         $commentedId = $request->get("commentedId");
-        $type = $request->get("type");
+        $commentable_type = $request->get("commentable_type");
         $parent_id = $request->input("parent_id");
 
         $comment = new Comment($arr);
         $comment->parent_id = $parent_id;
         $morphClass = null;
-        switch ($type) {
+        switch ($commentable_type) {
             case 'story':
                 $morphClass = Story::find($commentedId);
                 # code...

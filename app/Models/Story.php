@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\Enums\GenreType;
+use App\Enums\TypeCommentEnum;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Story extends Model
 {
     use Sluggable;
     use HasFactory;
-    protected $with = [];
     public $guarded = [];
     protected $appends = ['genre'];
     public function sluggable(): array
@@ -24,17 +27,34 @@ class Story extends Model
     }
     public function getGenreAttribute()
     {
-        return $this->genres->where('type', GenreType::CATEGORY)->first();
+        return $this->genres
+            ->where('type', GenreType::CATEGORY)
+            ->first()
+            ->only(['id', 'name']);
     }
     public function getCommentsCountAttribute()
     {
-        return Comment::query()->whereHasMorph(
-            'commentable',
-            [Story::class],
-            function ($query) {
-                $query->where('id', $this->id);
-            }
-        )->count();
+        return Comment::query()
+            ->whereType(TypeCommentEnum::COMMENT)
+            ->whereHasMorph(
+                'commentable',
+                [Story::class],
+                function ($query) {
+                    $query->where('id', $this->id);
+                }
+            )->count();
+    }
+    public function getRateCommentsCountAttribute()
+    {
+        return Comment::query()
+            ->whereType(TypeCommentEnum::RATING)
+            ->whereHasMorph(
+                'commentable',
+                [Story::class],
+                function ($query) {
+                    $query->where('id', $this->id);
+                }
+            )->count();
     }
     public function getReactionSummaryAttribute()
     {
@@ -59,21 +79,70 @@ class Story extends Model
         }
         return $reactions;
     }
+    public function getRateStoryAttribute()
+    {
+        $comments = Comment::query()
+            ->whereType(TypeCommentEnum::RATING)
+            ->whereHasMorph(
+                'commentable',
+                [Story::class],
+                function ($query) {
+                    $query->where('id', $this->id);
+                }
+            )->get();
+        $rateStory = collect();
+        $rate = [
+            'characteristic',
+            'plot',
+            'world_building',
+            'quality_convert'
+        ];
+        foreach ($comments as $comment) {
+            $rateStory->push($comment->rateStory->only(
+                $rate
+            ));
+        }
+        $avgStory = [];
+        foreach ($rate as $value) {
+            $avgStory[$value] = $rateStory->avg($value);
+        };
+
+        return $avgStory;
+    }
+    public function getChapterIndexAttribute()
+    {
+        if (!auth()->check()) {
+            return null;
+        } else {
+            $users = $this->users;
+            $user = $users
+                ->where('id', auth()->id())
+                ->whereNull('pivot.reading_deleted_at')
+                ->first();
+
+            return empty($user) ? null : $user->pivot->index;
+        }
+    }
     public function getNewestChapterAttribute()
     {
         return Chapter::query()->whereStoryId($this->id)->latest()->first(['name', 'index']);
+    }
+    public function getTruncateDescriptionAttribute(): string
+    {
+        return Str::limit($this->description);
     }
     public function genres()
     {
         return $this->belongsToMany(Genre::class);
     }
-    public function user()
+    public function converter(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "user_id", "id", "converter");
     }
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot(["index", "notified", "marked"]);
+        return $this->belongsToMany(User::class)
+            ->withPivot(["index", "notified", "reading_deleted_at"]);
     }
     public function chapters()
     {

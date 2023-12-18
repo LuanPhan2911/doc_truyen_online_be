@@ -4,10 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\RateStoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
-
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,24 +21,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/get_user', [AuthController::class, 'user'])->middleware('auth:sanctum');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::get('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth:sanctum');
+Route::group([
+    "controller" => AuthController::class
+], function () {
+    Route::get('/get_user',  'user')->middleware('auth:sanctum');
+    Route::post('/login',  'login');
+    Route::post('/register',  'register');
+    Route::get('/logout',  'logout')->middleware('auth:sanctum');
+    Route::get('email/verify/{id}/{hash}',  'emailVerifyAccept')->name('verification.verify');
+    Route::post('/email/verification_notification',  'emailVerifyNotification');
+    Route::post('/forgot_password',  'forgotPassword')->name('password.email');
+    Route::post('/reset_password',  'resetPassword')->name('password.reset');
+});
 
-Route::get('email/verify/{id}/{hash}', [AuthController::class, 'emailVerifyAccept'])->name('verification.verify');
-Route::post('/email/verification_notification', [AuthController::class, 'emailVerifyNotification']);
-Route::post('/forgot_password', [AuthController::class, 'forgotPassword'])->name('password.email');
-Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 Route::group([
-    "prefix" => "users"
+    "prefix" => "users",
+    "controller" => UserController::class
 ], function () {
-    Route::get("/notifies/{user}", [UserController::class, "notifies"]);
-    Route::get("/stories/{user}", [UserController::class, "stories"]);
-    Route::post('/{user}', [UserController::class, "update"]);
-    Route::get('/{user}', [UserController::class, "show"]);
+    Route::get("/notifies/{user}",  "notifies");
+    Route::get("/stories_reading",  "storiesReading");
+    Route::delete('/stories_reading/{story}',  "destroyReading");
+    Route::post('/{user}',  "update");
+    Route::get('/{user}', "show");
 });
 
 
@@ -59,6 +64,7 @@ Route::group([
     Route::get("/{story:slug}/chapter", [ChapterController::class, "index"]);
     Route::get("/{story:slug}/chapter/{index}", [ChapterController::class, "show"]);
     Route::post("/{story:slug}/chapter/{index}/reaction", [ChapterController::class, "reaction"]);
+    Route::post("/{story:slug}/rate", [RateStoryController::class, "store"]);
 });
 Route::group([
     'prefix' => 'chapter'
@@ -72,9 +78,12 @@ Route::group([
     Route::post('/create', [StoryController::class, 'store']);
     Route::get("/", [StoryController::class, "adminIndex"]);
     Route::post("/update/{id}", [StoryController::class, "update"]);
-    Route::post("/{story:slug}/chapter/create", [ChapterController::class, "store"]);
+    Route::get("/{story}", [StoryController::class, 'adminShow']);
+    Route::post("/{story}/chapter/create", [ChapterController::class, "store"]);
     Route::post("/chapter/{chapterId}", [ChapterController::class, "update"]);
-    Route::get("/{story:slug}/chapter/{index}", [ChapterController::class, "adminShow"]);
+    Route::get("/{story}/chapter/{index}", [ChapterController::class, "adminShow"]);
+
+    Route::get("/{story}/chapter", [ChapterController::class, "index"]);
 });
 Route::group([
     "prefix" => "comments"

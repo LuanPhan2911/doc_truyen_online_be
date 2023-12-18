@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Story;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -28,11 +30,16 @@ class UserController extends Controller
             "gender"
 
         ]);
+
         if ($request->hasFile("avatar")) {
             $path = Storage::disk("public")->put('users', $request->file('avatar'));
-            $arr["avatar"] = $path;
+            // Cloudinary::uploadApi();
+            // $uploadedAvatar = $request->file('avatar')->storeOnCloudinary('stop_truyen');
+            // $arr["avatar"] = $uploadedAvatar->getPublicId();
+            $arr['avatar'] = $path;
             if (!empty($user->avatar)) {
                 Storage::disk("public")->delete($user->avatar);
+                // Cloudinary::destroy($user->getRawOriginal('avatar'));
             }
         }
         $user->update($arr);
@@ -41,22 +48,47 @@ class UserController extends Controller
             "data" => $user,
         ]);
     }
-    public function stories(User $user)
+    public function storiesReading()
     {
 
-        // $user = request()->user();
+        $user = request()->user();
+        $stories = null;
+        $stories_not_auth = Story::query()
+            ->withCount('chapters')
+            ->latest()
+            ->limit(5)
+            ->get();
         if (!empty($user)) {;
             $user->load([
-                "stories:id,name,avatar,slug"
+                "stories:id,name,avatar,slug,updated_at"
             ]);
-            $stories = $user->stories->loadCount("chapters");
-            return $this->success([
-                "data" => $stories
-            ]);
+
+            $stories_auth = $user->stories
+                ->loadCount('chapters')
+                ->whereNull('pivot.reading_deleted_at')
+                ->sortBy([
+                    ['pivot.updated_at', 'desc']
+                ])
+                ->values()
+                ->take(5);
+            $stories = $stories_auth;
+            if (empty($stories_auth)) {
+                $stories = $stories_not_auth;
+            }
+        } else {
+            $stories = $stories_not_auth;
         }
-        return $this->failure([
-            "message" => "User not found"
+        return $this->success([
+            "data" => $stories
         ]);
+    }
+    public function destroyReading(Story $story)
+    {
+        $user = Auth::user();
+        $user->stories()->syncWithoutDetaching([$story->id => [
+            "reading_deleted_at" => Date::now()
+        ]]);
+        return $this->success();
     }
     public function notifies(User $user)
     {

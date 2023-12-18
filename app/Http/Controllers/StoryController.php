@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GenreType;
 use App\Models\Story;
 use App\Http\Requests\StoreStoryRequest;
 use App\Http\Requests\UpdateStoryRequest;
 use App\Models\Chapter;
 use App\Models\Comment;
 use App\Traits\ResponseTrait;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
@@ -28,8 +31,6 @@ class StoryController extends Controller
                 "genres:id,name,type",
             ])
             ->withCount("chapters");
-
-
         if ($request->has('orderBy')) {
             $orderBy = $request->get("orderBy");
             $query->orderBy("updated_at", $orderBy);
@@ -55,6 +56,8 @@ class StoryController extends Controller
             $stories = $query->limit(8)->get();
         }
 
+        $stories->makeHidden('description');
+        $stories->append(['truncate_description']);
         return $this->success([
             'data' => $stories
         ]);
@@ -88,7 +91,10 @@ class StoryController extends Controller
         $genres_id = $request->safe()->genres_id;
         if ($request->hasFile('avatar')) {
             $path = Storage::disk("public")->put('stories', $request->file('avatar'));
-            $arr["avatar"] = $path;
+            // Cloudinary::uploadApi();
+            // $uploadedAvatar = $request->file('avatar')->storeOnCloudinary('stop_truyen');
+            // $arr["avatar"] = $uploadedAvatar->getPublicId();
+            $arr['avatar'] = $path;
         }
         $story = Story::create($arr);
         $story->genres()->attach($genres_id);
@@ -107,13 +113,24 @@ class StoryController extends Controller
     public function show(Request $request, Story $story)
     {
         $story->load([
-            "user:id,name",
-            "genres:id,name,type",
+            "converter:id,name",
+            "genres:id,name,type,slug",
+
 
         ])
             ->loadCount("chapters");
 
-        $story->append(['comments_count', 'reaction_summary', 'newest_chapter']);
+        $story->append(
+            [
+                'comments_count',
+                'reaction_summary',
+                'newest_chapter',
+                'rate_comments_count',
+                'rate_story',
+                'chapter_index'
+            ]
+        );
+        $story->makeHidden('users');
         return $this->success([
             "data" => $story,
         ]);
@@ -142,7 +159,7 @@ class StoryController extends Controller
         $id = $request->get("id");
         $story = Story::query()
             ->with([
-                "user:id,name",
+                "converter:id,name",
                 "genres:id,name,type"
             ])
             ->find($id);
@@ -158,13 +175,16 @@ class StoryController extends Controller
             $story->genres()->sync($genres_id);
         }
         if ($request->hasFile("avatar")) {
-            $path = Storage::disk("public")->put('users', $request->file('avatar'));
-            $arr["avatar"] = $path;
+
+            $path = Storage::disk("public")->put('stories', $request->file('avatar'));
+            $arr['avatar'] = $path;
             if (!empty($story->avatar)) {
                 Storage::disk("public")->delete($story->avatar);
             }
         }
         $story->update($arr);
+        $story->slug = SlugService::createSlug(Story::class, 'slug', $story->name);
+        $story->save();
         return $this->success([
             "data" => $story,
         ]);
@@ -182,18 +202,26 @@ class StoryController extends Controller
     }
     public function adminIndex(Request $request)
     {
-        $userId = $request->get("user_id");
+        $userId = auth()->id();
         $stories = Story::query()
             ->with([
-                "user:id,name",
                 "genres:id,name,type"
             ])
-            ->whereHas('user', function ($q) use ($userId) {
-                return $q->whereId($userId);
-            })
+            ->whereUserId($userId)
             ->get();
         return $this->success([
             "data" => $stories
+        ]);
+    }
+    public function adminShow(Story $story)
+    {
+        $story->load([
+            "converter:id,name",
+            "genres:id,name,type",
+
+        ]);
+        return $this->success([
+            'data' => $story
         ]);
     }
 }

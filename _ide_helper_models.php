@@ -49,6 +49,8 @@ namespace App\Models{
  * @property string $commentable_type
  * @property int $commentable_id
  * @property string $message
+ * @property int $type
+ * @property bool $is_leak
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $commentable
@@ -57,6 +59,7 @@ namespace App\Models{
  * @property-read \Conner\Likeable\LikeCounter|null $likeCounter
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Conner\Likeable\Like> $likes
  * @property-read int|null $likes_count
+ * @property-read \App\Models\RateStory|null $rateStory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $replies
  * @property-read int|null $replies_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Report> $reports
@@ -70,9 +73,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereCommentableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment whereIsLeak($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereLikedBy($userId = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereMessage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Comment whereUserId($value)
  */
@@ -99,6 +104,36 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Genre withUniqueSlugConstraints(\Illuminate\Database\Eloquent\Model $model, string $attribute, array $config, string $slug)
  */
 	class Genre extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\RateStory
+ *
+ * @property int $id
+ * @property int $story_id
+ * @property float $characteristic
+ * @property float $plot
+ * @property float $world_building
+ * @property float $quality_convert
+ * @property int $comment_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\RateStoryFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory query()
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereCharacteristic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereCommentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory wherePlot($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereQualityConvert($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereStoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RateStory whereWorldBuilding($value)
+ */
+	class RateStory extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -147,14 +182,18 @@ namespace App\Models{
  * @property-read int|null $chapters_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Comment> $comments
  * @property-read int|null $comments_count
+ * @property-read \App\Models\User $converter
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Genre> $genres
  * @property-read int|null $genres_count
+ * @property-read mixed $chapter_index
  * @property-read mixed $genre
  * @property-read mixed $newest_chapter
+ * @property-read mixed $rate_comments_count
+ * @property-read mixed $rate_story
  * @property-read mixed $reaction_summary
+ * @property-read string $truncate_description
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Report> $reports
  * @property-read int|null $reports_count
- * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
  * @method static \Database\Factories\StoryFactory factory($count = null, $state = [])

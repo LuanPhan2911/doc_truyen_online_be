@@ -17481,7 +17481,1075 @@
      
 }
 
-        namespace Spatie\LaravelIgnition\Facades { 
+        namespace CloudinaryLabs\CloudinaryLaravel\Facades { 
+            /**
+     * Class Cloudinary
+     *
+     * @package CloudinaryLabs\CloudinaryLaravel\Facades
+     */ 
+        class Cloudinary {
+                    /**
+         * Create a Cloudinary Config Instance
+         *
+         * @static 
+         */ 
+        public static function setCloudinaryConfig()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->setCloudinaryConfig();
+        }
+                    /**
+         * Set User Agent and Platform
+         *
+         * @static 
+         */ 
+        public static function setUserPlatform()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->setUserPlatform();
+        }
+                    /**
+         * Set Analytics
+         *
+         * @static 
+         */ 
+        public static function setAnalytics()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->setAnalytics();
+        }
+                    /**
+         * Create a Cloudinary Instance
+         *
+         * @static 
+         */ 
+        public static function bootCloudinary()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->bootCloudinary();
+        }
+                    /**
+         * Expose the Cloudinary Admin Functionality
+         *
+         * @static 
+         */ 
+        public static function admin()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->admin();
+        }
+                    /**
+         * Expose the Cloudinary Search Functionality
+         *
+         * @static 
+         */ 
+        public static function search()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->search();
+        }
+                    /**
+         * Uploads an asset to a Cloudinary account.
+         * 
+         * The asset can be:
+         * * a local file path
+         * * the actual data (byte array buffer)
+         * * the Data URI (Base64 encoded), max ~60 MB (62,910,000 chars)
+         * * the remote FTP, HTTP or HTTPS URL address of an existing file
+         * * a private storage bucket (S3 or Google Storage) URL of a whitelisted bucket
+         *
+         * @param string $file The asset to upload.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @throws ApiError
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#upload_method
+         * @static 
+         */ 
+        public static function upload($file, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->upload($file, $options);
+        }
+                    /**
+         * Expose the Cloudinary Upload Functionality
+         *
+         * @static 
+         */ 
+        public static function uploadApi()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->uploadApi();
+        }
+                    /**
+         * Uploads an asset to a Cloudinary account.
+         * 
+         * The asset can be:
+         * * a local file path
+         * * the actual data (byte array buffer)
+         * * the Data URI (Base64 encoded), max ~60 MB (62,910,000 chars)
+         * * the remote FTP, HTTP or HTTPS URL address of an existing file
+         * * a private storage bucket (S3 or Google Storage) URL of a whitelisted bucket
+         * 
+         *  This is asynchronous
+         *
+         * @static 
+         */ 
+        public static function uploadAsync($file, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->uploadAsync($file, $options);
+        }
+                    /**
+         * Uploads an asset to a Cloudinary account.
+         * 
+         * The upload is not signed so an upload preset is required.
+         *
+         * @param string $file The asset to upload.
+         * @param string $uploadPreset The name of an upload preset.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @throws ApiError
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#unsigned_upload_syntax
+         * @static 
+         */ 
+        public static function unsignedUpload($file, $uploadPreset, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->unsignedUpload($file, $uploadPreset, $options);
+        }
+                    /**
+         * Uploads an asset to a Cloudinary account.
+         * 
+         * The upload is not signed so an upload preset is required.
+         * 
+         * This is asynchronous
+         *
+         * @static 
+         */ 
+        public static function unsignedUploadAsync($file, $uploadPreset, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->unsignedUploadAsync($file, $uploadPreset, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $file
+         * @param array $options
+         * @return \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine 
+         * @throws ApiError
+         * @static 
+         */ 
+        public static function uploadFile($file, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->uploadFile($file, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $file
+         * @param array $options
+         * @return \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine 
+         * @throws ApiError
+         * @static 
+         */ 
+        public static function uploadVideo($file, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->uploadVideo($file, $options);
+        }
+                    /**
+         * 
+         *
+         * @return Array 
+         * @static 
+         */ 
+        public static function getResponse()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getResponse();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getAssetId()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getAssetId();
+        }
+                    /**
+         * Get the name of the file after it has been uploaded to Cloudinary
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getFileName()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getFileName();
+        }
+                    /**
+         * Get the public id of the file (also known as the name of the file) after it has been uploaded to Cloudinary
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getPublicId()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getPublicId();
+        }
+                    /**
+         * Get the name of the file before it was uploaded to Cloudinary
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getOriginalFileName()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getOriginalFileName();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getVersion()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getVersion();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getVersionId()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getVersionId();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getSignature()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getSignature();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getWidth()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getWidth();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getHeight()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getHeight();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getExtension()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getExtension();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getFileType()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getFileType();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getTimeUploaded()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getTimeUploaded();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getTags()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getTags();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getPages()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getPages();
+        }
+                    /**
+         * 
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getReadableSize()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getReadableSize();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getSize()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getSize();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getPlaceHolder()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getPlaceHolder();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getPath()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getPath();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getSecurePath()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getSecurePath();
+        }
+                    /**
+         * 
+         *
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getPhash()
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getPhash();
+        }
+                    /**
+         * Fetches a new Image with current instance configuration.
+         *
+         * @param string $publicId The public ID of the image.
+         * @return \CloudinaryLabs\CloudinaryLaravel\Image 
+         * @static 
+         */ 
+        public static function getImage($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getImage($publicId);
+        }
+                    /**
+         * Fetches a new Video with current instance configuration.
+         *
+         * @param string|mixed $publicId The public ID of the video.
+         * @return \CloudinaryLabs\CloudinaryLaravel\Video 
+         * @static 
+         */ 
+        public static function getVideo($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getVideo($publicId);
+        }
+                    /**
+         * Fetches a raw file with current instance configuration.
+         *
+         * @param string|mixed $publicId The public ID of the file.
+         * @return \File 
+         * @static 
+         */ 
+        public static function getFile($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getFile($publicId);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @return \Cloudinary\Tag\ImageTag 
+         * @static 
+         */ 
+        public static function getImageTag($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getImageTag($publicId);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @return \Cloudinary\Tag\VideoTag 
+         * @static 
+         */ 
+        public static function getVideoTag($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getVideoTag($publicId);
+        }
+                    /**
+         * Adds a tag to the assets specified.
+         *
+         * @param string $tag The name of the tag to add.
+         * @param array $publicIds The public IDs of the assets to add the tag to.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#tags_method
+         * @static 
+         */ 
+        public static function addTag($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->addTag($tag, $publicIds, $options);
+        }
+                    /**
+         * Adds a tag to the assets specified.
+         * 
+         * This is an asynchronous function.
+         *
+         * @static 
+         */ 
+        public static function addTagAsync($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->addTagAsync($tag, $publicIds, $options);
+        }
+                    /**
+         * Removes a tag from the assets specified.
+         *
+         * @param string $tag The name of the tag to remove.
+         * @param array|string $publicIds The public IDs of the assets to remove the tags from.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#tags_method
+         * @static 
+         */ 
+        public static function removeTag($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeTag($tag, $publicIds, $options);
+        }
+                    /**
+         * Removes a tag from the assets specified.
+         * 
+         * This is an asynchronous function.
+         *
+         * @static 
+         */ 
+        public static function removeTagAsync($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeTagAsync($tag, $publicIds, $options);
+        }
+                    /**
+         * Removes all tags from the assets specified.
+         *
+         * @param array $publicIds The public IDs of the assets to remove all tags from.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#tags_method
+         * @static 
+         */ 
+        public static function removeAllTags($publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeAllTags($publicIds, $options);
+        }
+                    /**
+         * Removes all tags from the assets specified.
+         * 
+         * This is an asynchronous function.
+         *
+         * @static 
+         */ 
+        public static function removeAllTagsAsync($publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeAllTagsAsync($publicIds, $options);
+        }
+                    /**
+         * Replaces all existing tags on the assets specified with the tag specified.
+         *
+         * @param string $tag The new tag with which to replace the existing tags.
+         * @param array|string $publicIds The public IDs of the assets to replace the tags of.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#tags_method
+         * @static 
+         */ 
+        public static function replaceTag($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->replaceTag($tag, $publicIds, $options);
+        }
+                    /**
+         * Replaces all existing tags on the assets specified with the tag specified.
+         * 
+         * This is an asynchronous function.
+         *
+         * @static 
+         */ 
+        public static function replaceTagAsync($tag, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->replaceTagAsync($tag, $publicIds, $options);
+        }
+                    /**
+         * Creates a sprite from all images that have been assigned a specified tag.
+         * 
+         * The process produces two files:
+         * * A single image file containing all the images with the specified tag (PNG by default).
+         * * A CSS file that includes the style class names and the location of the individual images in the sprite.
+         *
+         * @param string $tag The tag that indicates which images to include in the sprite.
+         * @param array $options The optional parameters. See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#sprite_method
+         * @static 
+         */ 
+        public static function generateSprite($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateSprite($tag, $options);
+        }
+                    /**
+         * Creates a sprite from all images that have been assigned a specified tag.
+         * 
+         * This is an asynchronous function.
+         *
+         * @static 
+         */ 
+        public static function generateSpriteAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateSpriteAsync($tag, $options);
+        }
+                    /**
+         * Creates a PDF file from images in your media library that have been assigned a specific tag.
+         * 
+         * Important note for free accounts:
+         * By default, while you can use this method to generate PDF files, free Cloudinary accounts are blocked from delivering
+         * files in PDF format for security reasons.
+         * For details or to request that this limitation be removed for your free account, see Media delivery.
+         *
+         * @see https://cloudinary.com/documentation/paged_and_layered_media#creating_pdf_files_from_images
+         * @static 
+         */ 
+        public static function generatePDF($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generatePDF($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generatePDFAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generatePDFAsync($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedGIF($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedGIF($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedPNG($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedPNG($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedPNGAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedPNGAsync($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedWEBP($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedWEBP($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedWEBPAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedWEBPAsync($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedMP4($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedMP4($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedMP4Async($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedMP4Async($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedWEBM($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedWEBM($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function generateAnimatedWEBMAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateAnimatedWEBMAsync($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function multi($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->multi($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $tag
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function multiAsync($tag, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->multiAsync($tag, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function explode($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->explode($publicId, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function explodeAsync($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->explodeAsync($publicId, $options);
+        }
+                    /**
+         * Dynamically generates an image from a given textual string.
+         *
+         * @param string $text The text string to generate an image for.
+         * @param array $options The optional parameters.  See the upload API documentation.
+         * @return \Cloudinary\Api\ApiResponse 
+         * @see https://cloudinary.com/documentation/image_upload_api_reference#text_method
+         * @static 
+         */ 
+        public static function generateImageFromText($text, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateImageFromText($text, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $text
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function generateImageFromTextAsync($text, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->generateImageFromTextAsync($text, $options);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @param null $targetFormat
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function createArchive($options = [], $targetFormat = null)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->createArchive($options, $targetFormat);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @param null $targetFormat
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function createArchiveAsync($options = [], $targetFormat = null)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->createArchiveAsync($options, $targetFormat);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function createZip($options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->createZip($options);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function createZipAsync($options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->createZipAsync($options);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @return string 
+         * @static 
+         */ 
+        public static function downloadZipUrl($options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->downloadZipUrl($options);
+        }
+                    /**
+         * 
+         *
+         * @param array $options
+         * @return string 
+         * @static 
+         */ 
+        public static function downloadArchiveUrl($options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->downloadArchiveUrl($options);
+        }
+                    /**
+         * 
+         *
+         * @param $context
+         * @param array $publicIds
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function addContext($context, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->addContext($context, $publicIds, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $context
+         * @param array $publicIds
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function addContextAsync($context, $publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->addContextAsync($context, $publicIds, $options);
+        }
+                    /**
+         * 
+         *
+         * @param array $publicIds
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function removeAllContext($publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeAllContext($publicIds, $options);
+        }
+                    /**
+         * 
+         *
+         * @param array $publicIds
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function removeAllContextAsync($publicIds = [], $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->removeAllContextAsync($publicIds, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return \Cloudinary\Api\ApiResponse 
+         * @static 
+         */ 
+        public static function destroy($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->destroy($publicId, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function destroyAsync($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->destroyAsync($publicId, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $from
+         * @param $to
+         * @param array $options
+         * @return mixed 
+         * @static 
+         */ 
+        public static function rename($from, $to, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->rename($from, $to, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $from
+         * @param $to
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function renameAsync($from, $to, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->renameAsync($from, $to, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return mixed 
+         * @static 
+         */ 
+        public static function explicit($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->explicit($publicId, $options);
+        }
+                    /**
+         * 
+         *
+         * @param $publicId
+         * @param array $options
+         * @return \GuzzleHttp\Promise\PromiseInterface 
+         * @static 
+         */ 
+        public static function explicitAsync($publicId, $options = [])
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->explicitAsync($publicId, $options);
+        }
+                    /**
+         * Get Resource data
+         *
+         * @param string $path
+         * @return array 
+         * @static 
+         */ 
+        public static function getResource($path)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getResource($path);
+        }
+                    /**
+         * Get the url of a file
+         *
+         * @param string $publicId
+         * @return string|false 
+         * @static 
+         */ 
+        public static function getUrl($publicId)
+        {
+                        /** @var \CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine $instance */
+                        return $instance->getUrl($publicId);
+        }
+         
+    }
+     
+}
+
+    namespace Spatie\LaravelIgnition\Facades { 
             /**
      * 
      *
@@ -17932,6 +19000,36 @@
         public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
         {
                         return \Illuminate\Http\Request::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
+        }
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class UploadedFile {
+                    /**
+         * 
+         *
+         * @see \CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::bootMacros()
+         * @param mixed $folder
+         * @static 
+         */ 
+        public static function storeOnCloudinary($folder = null)
+        {
+                        return \Illuminate\Http\UploadedFile::storeOnCloudinary($folder);
+        }
+                    /**
+         * 
+         *
+         * @see \CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::bootMacros()
+         * @param mixed $folder
+         * @param mixed $publicId
+         * @static 
+         */ 
+        public static function storeOnCloudinaryAs($folder = null, $publicId = null)
+        {
+                        return \Illuminate\Http\UploadedFile::storeOnCloudinaryAs($folder, $publicId);
         }
          
     }
@@ -21704,6 +22802,7 @@ namespace  {
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
             class Vite extends \Illuminate\Support\Facades\Vite {}
+            class Cloudinary extends \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary {}
             class Flare extends \Spatie\LaravelIgnition\Facades\Flare {}
      
 }

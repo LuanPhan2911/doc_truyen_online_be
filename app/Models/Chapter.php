@@ -12,6 +12,8 @@ class Chapter extends Model  implements ReactableInterface
     use Reactable;
     use HasFactory;
     protected $fillable = ['name', 'story_id', 'content', 'index'];
+    protected $hidden = ['reactions'];
+    protected $touches = ['story'];
     public function story()
     {
         return $this->belongsTo(Story::class);

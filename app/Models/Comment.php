@@ -9,7 +9,10 @@ class Comment extends Model
 {
     use HasFactory;
     use \Conner\Likeable\Likeable;
-    public $fillable = ["user_id", "message", "parent_id"];
+    public $fillable = ["user_id", "message", "parent_id", "is_leak", "type"];
+    protected $casts = [
+        'is_leak' => 'boolean',
+    ];
     public function commentable()
     {
         return $this->morphTo();
@@ -25,5 +28,9 @@ class Comment extends Model
     public function reports()
     {
         return $this->morphMany(Report::class, "reportable");
+    }
+    public function rateStory()
+    {
+        return $this->hasOne(RateStory::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Story;
 use App\Traits\ResponseTrait;
 use DevDojo\LaravelReactions\Models\Reaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 
 class ChapterController extends Controller
 {
@@ -62,9 +63,6 @@ class ChapterController extends Controller
         $arr["index"] = $index;
         $arr["story_id"] = $story?->id;
         $chapter = Chapter::create($arr);
-        if (!empty($chapter)) {
-            $story->touch();
-        }
         return $this->success([
             'data' => $chapter
         ]);
@@ -105,13 +103,36 @@ class ChapterController extends Controller
             ])->first();
         $userReaction = null;
         $countChapter = Chapter::query()->where("story_id", $story->id)->count();
+        $reactionSummary = $chapter?->getReactionsSummary();
 
-        $reactionSummary = $chapter->getReactionsSummary();
         if (!empty($user)) {
-            $user->stories()->syncWithoutDetaching([$story->id => [
-                "index" => $index,
-            ]]);
-            if ($chapter->reacted($user)) {
+            $hasStory = $user->stories->where('id', $story->id)->count() > 0;
+            if ($hasStory) {
+                $user->stories()->updateExistingPivot(
+                    $story->id,
+                    [
+                        "index" => $index,
+                        "reading_deleted_at" => NULL,
+                        "updated_at" => Date::now()
+                    ]
+                );
+            } else {
+                $user->stories()->attach(
+                    $story->id,
+                    [
+                        "index" => $index,
+                        "reading_deleted_at" => NULL,
+                        "created_at" => Date::now(),
+                        "updated_at" => Date::now()
+                    ],
+
+                );
+            }
+
+
+
+
+            if (isset($reactionSummary) && $chapter->reacted($user)) {
                 foreach ($chapter->reactions as $reaction) {
                     $responder = $reaction->getResponder();
                     if ($responder->id === $user->id) {
@@ -120,7 +141,6 @@ class ChapterController extends Controller
                 };
             }
         }
-        $chapter->makeHidden('reactions');
 
         return $this->success([
             'data' => [
@@ -129,7 +149,8 @@ class ChapterController extends Controller
                 "reaction" => [
                     'user' => $userReaction,
                     'summary' => $reactionSummary
-                ]
+                ],
+
             ]
 
 

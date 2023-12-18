@@ -17,4 +17,5 @@ final class GenreType extends Enum
     const CHARACTER = 2;
     const WORLD = 3;
     const TAG = 4;
+    const AUTHOR = 5;
 }

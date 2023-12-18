@@ -6,6 +6,7 @@ namespace App\Models;
 
 use DevDojo\LaravelReactions\Traits\Reacts;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,8 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function stories()
     {
-        return $this->belongsToMany(Story::class)->withPivot([
-            "index", "marked", "notified"
-        ]);
+        return $this->belongsToMany(Story::class)
+            ->withPivot([
+                'index',
+                'reading_deleted_at'
+            ])
+            ->withTimestamps();
     }
 }

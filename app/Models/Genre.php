@@ -15,6 +15,7 @@ class Genre extends Model
         'type'
     ];
     public $timestamps = false;
+    protected $hidden = ['pivot'];
     public function sluggable(): array
     {
         return [

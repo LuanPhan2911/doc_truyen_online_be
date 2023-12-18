@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests;
 
-
-use App\Models\Story;
+use App\Enums\TypeCommentEnum;
 use App\Models\User;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
@@ -44,8 +43,16 @@ class StoreCommentRequest extends FormRequest
             "commentedId" => [
                 "required",
             ],
-            "type" => [
+            "commentable_type" => [
                 "required",
+            ],
+            'type' => [
+                'required',
+                Rule::in(TypeCommentEnum::getValues()),
+            ],
+            'is_leak' => [
+                'required',
+                'boolean'
             ]
         ];
     }

@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\RateStory;
 use App\Http\Requests\StoreRateStoryRequest;
 use App\Http\Requests\UpdateRateStoryRequest;
+use App\Models\Story;
+use App\Traits\ResponseTrait;
 
 class RateStoryController extends Controller
 {
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -34,9 +37,20 @@ class RateStoryController extends Controller
      * @param  \App\Http\Requests\StoreRateStoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRateStoryRequest $request)
+    public function store(StoreRateStoryRequest $request, Story $story)
     {
-        //
+        $arr = $request->validated();
+        $rateStory = new RateStory($arr);
+        $rateStory->story_id = $story->id;
+        $rateStory->save();
+        return $this->success([
+            'data' => $rateStory->only([
+                'characteristic',
+                'plot',
+                'world_building',
+                'quality_convert'
+            ])
+        ]);
     }
 
     /**
