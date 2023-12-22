@@ -12,6 +12,32 @@
 
 namespace App\Models{
 /**
+ * App\Models\Author
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Story> $stories
+ * @property-read int|null $stories_count
+ * @method static \Database\Factories\AuthorFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|Author findSimilarSlugs(string $attribute, array $config, string $slug)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Author newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Author query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Author whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Author withUniqueSlugConstraints(\Illuminate\Database\Eloquent\Model $model, string $attribute, array $config, string $slug)
+ */
+	class Author extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Chapter
  *
  * @property int $id
@@ -24,6 +50,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \DevDojo\LaravelReactions\Models\Reaction> $reactions
  * @property-read int|null $reactions_count
  * @property-read \App\Models\Story $story
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
  * @method static \Database\Factories\ChapterFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Chapter newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Chapter newQuery()
@@ -170,14 +198,15 @@ namespace App\Models{
  * @property int $id
  * @property string $name
  * @property string $description
- * @property string $author_name
  * @property string|null $avatar
  * @property string $slug
+ * @property int|null $author_id
  * @property int $status
  * @property int $view
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Author|null $author
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Chapter> $chapters
  * @property-read int|null $chapters_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Comment> $comments
@@ -201,7 +230,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Story newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Story newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Story query()
- * @method static \Illuminate\Database\Eloquent\Builder|Story whereAuthorName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Story whereAuthorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Story whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Story whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Story whereDescription($value)
@@ -233,6 +262,8 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Chapter> $chapters
+ * @property-read int|null $chapters_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Report> $reports

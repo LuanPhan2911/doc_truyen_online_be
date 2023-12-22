@@ -16,18 +16,17 @@ class Story extends Model
     use Sluggable;
     use HasFactory;
     public $guarded = [];
-    protected $appends = ['genre'];
     public function sluggable(): array
     {
         return [
             'slug' => [
                 'source' => 'name'
-            ]
+            ],
         ];
     }
     public function getGenreAttribute()
     {
-        return $this->genres
+        return $this->genres()
             ->where('type', GenreType::CATEGORY)
             ->first()
             ->only(['id', 'name']);
@@ -130,6 +129,10 @@ class Story extends Model
     public function getTruncateDescriptionAttribute(): string
     {
         return Str::limit($this->description);
+    }
+    public function author()
+    {
+        return $this->belongsTo(Author::class);
     }
     public function genres()
     {

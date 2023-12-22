@@ -6,9 +6,11 @@ use App\Models\Chapter;
 use App\Http\Requests\StoreChapterRequest;
 use App\Http\Requests\UpdateChapterRequest;
 use App\Models\Story;
+use App\Models\User;
 use App\Traits\ResponseTrait;
 use DevDojo\LaravelReactions\Models\Reaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 
 class ChapterController extends Controller
@@ -90,7 +92,7 @@ class ChapterController extends Controller
     }
     public function show(Story $story, $index)
     {
-        $user = request()->user();
+
         $chapter = Chapter::query()
             ->with([
                 "story:id,author_name,name",
@@ -105,7 +107,13 @@ class ChapterController extends Controller
         $countChapter = Chapter::query()->where("story_id", $story->id)->count();
         $reactionSummary = $chapter?->getReactionsSummary();
 
-        if (!empty($user)) {
+        if (Auth::check()) {
+            $user = User::find(Auth::id());
+
+            $user->chapters()->updateExistingPivot($chapter->id, [
+                'is_seen' => 1
+            ]);
+
             $hasStory = $user->stories->where('id', $story->id)->count() > 0;
             if ($hasStory) {
                 $user->stories()->updateExistingPivot(

@@ -18,4 +18,8 @@ class Chapter extends Model  implements ReactableInterface
     {
         return $this->belongsTo(Story::class);
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

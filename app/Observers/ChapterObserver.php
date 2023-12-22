@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Chapter;
 use App\Models\Story;
+use Illuminate\Support\Facades\Date;
 
 class ChapterObserver
 {
@@ -15,16 +16,17 @@ class ChapterObserver
      */
     public function created(Chapter $chapter)
     {
-        // $story = Story::find($chapter->story_id);
-        // $story->load("users");
-        // $users_id = $story->users()->wherePivot("notified", 1)->get()->pluck("id");
-        // $collection = collect($users_id)->map(function ($userId) use ($chapter) {
-        //     return [
-        //         "user_id" => $userId,
-        //         "index" => $chapter->index,
-        //     ];
-        // })->toArray();
-        // $story->notifies()->createMany($collection);
+        $story = Story::find($chapter->story_id);
+        $users_id = $story->users()->wherePivot('notified', 1)->pluck('users.id');
+
+        $notifies = collect($users_id)->map(function ($user_id) {
+            return [
+                'user_id' => $user_id,
+                'created_at' => Date::now(),
+                'updated_at' => Date::now(),
+            ];
+        });
+        $chapter->users()->attach($notifies);
     }
 
     /**

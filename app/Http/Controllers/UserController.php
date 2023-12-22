@@ -85,31 +85,60 @@ class UserController extends Controller
     public function destroyReading(Story $story)
     {
         $user = Auth::user();
-        $user->stories()->syncWithoutDetaching([$story->id => [
-            "reading_deleted_at" => Date::now()
-        ]]);
+        $user->stories()->updateExistingPivot(
+            $story->id,
+            ["reading_deleted_at" => Date::now()]
+        );
         return $this->success();
     }
-    public function notifies(User $user)
+    public function updateNotifies(User $user, Story $story)
     {
-        if (!empty($user)) {;
-            $user->load([
-                "notifies" => [
-                    "story:id,name,avatar,slug"
-                ]
-            ]);
-            $notifies = $user->notifies;
-            $new_notifies_count = $user->notifies()->count('active', false);
-            return $this->success([
-                "data" => [
-                    "notifies" => $notifies,
-                    "new_notifies_count" => $new_notifies_count
-                ],
 
+        $user = User::find(Auth::id());
+        $storyNotify = $user->stories()->where('stories.id', $story->id)->first();
+        $user->stories()->updateExistingPivot($story->id, [
+            'notified' => !boolval($storyNotify?->pivot?->notified)
+        ]);
+        return $this->success();
+    }
+    public function storiesReadingPaginate()
+    {
+        if (Auth::check()) {
+            $user = User::find(Auth::id());
+            $stories_paginate = $user->stories()
+                ->withCount('chapters')
+                ->paginate(10);
+            $stories_paginate->makeHidden([
+                'description'
+            ]);
+            return $this->success([
+                'data' => $stories_paginate
             ]);
         }
-        return $this->failure([
-            "message" => "User not found"
+        return $this->failure();
+    }
+    public function notifies()
+    {
+        $user = User::find(Auth::id());
+        $user->load([
+            'chapters:id,name,index,story_id' => [
+                'story:id,name,slug,avatar'
+            ]
+        ]);
+        $notifies = $user->chapters
+            ->where('pivot.is_seen', 0)
+            ->sortBy([
+                ['pivot.created_at', 'desc']
+            ])
+            ->values()
+            ->take(5);
+
+        $notifies->makeHidden([
+            'pivot',
+            'story_id'
+        ]);
+        return $this->success([
+            'data' => $notifies
         ]);
     }
 }

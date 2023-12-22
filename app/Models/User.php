@@ -59,8 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Story::class)
             ->withPivot([
                 'index',
-                'reading_deleted_at'
+                'reading_deleted_at',
+                'notified'
             ])
+            ->withTimestamps();
+    }
+    public function chapters()
+    {
+        return $this->belongsToMany(Chapter::class)
+            ->withPivot('is_seen')
             ->withTimestamps();
     }
 }

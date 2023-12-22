@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\StatusStoryEnum;
 use App\Enums\ViewStoryEnum;
+use App\Models\Author;
 use App\Models\Genre;
 use App\Models\Story;
 use App\Models\User;
@@ -58,8 +59,9 @@ class StoreStoryRequest extends FormRequest
                 'required',
                 Rule::exists(Genre::class, 'id'),
             ],
-            "author_name" => [
-                "required"
+            "author_id" => [
+                'required',
+                Rule::exists(Author::class, 'id'),
             ]
         ];
     }

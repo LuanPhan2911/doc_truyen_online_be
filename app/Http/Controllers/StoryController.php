@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\GenreType;
+use App\Enums\ViewStoryEnum;
 use App\Models\Story;
 use App\Http\Requests\StoreStoryRequest;
 use App\Http\Requests\UpdateStoryRequest;
-use App\Models\Chapter;
-use App\Models\Comment;
 use App\Traits\ResponseTrait;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 
 class StoryController extends Controller
@@ -29,6 +25,7 @@ class StoryController extends Controller
         $query = Story::query()
             ->with([
                 "genres:id,name,type",
+                "author:id,name,slug"
             ])
             ->withCount("chapters");
         if ($request->has('orderBy')) {
@@ -48,16 +45,21 @@ class StoryController extends Controller
         }
         if ($request->has("name")) {
             $name = $request->name;
-            $query->where("name", "like", "%" . $name . "%");
+            $query->orWhere("name", "like", "%" . $name . "%");
+            $query->orWhereHas('author', function ($q) use ($name) {
+                return $q->where("name", "like", "%" . $name . "%");
+            });
+        }
+        if ($request->has('view')) {
+            $query->whereView($request->get('view'));
         }
         if ($request->has("filter")) {
             $stories =  $query->paginate(10);
         } else {
             $stories = $query->limit(8)->get();
         }
-
         $stories->makeHidden('description');
-        $stories->append(['truncate_description']);
+        $stories->append(['truncate_description', 'genre']);
         return $this->success([
             'data' => $stories
         ]);
@@ -86,14 +88,11 @@ class StoryController extends Controller
             'description',
             'view',
             'user_id',
-            "author_name",
+            'author_id'
         ]);
         $genres_id = $request->safe()->genres_id;
         if ($request->hasFile('avatar')) {
             $path = Storage::disk("public")->put('stories', $request->file('avatar'));
-            // Cloudinary::uploadApi();
-            // $uploadedAvatar = $request->file('avatar')->storeOnCloudinary('stop_truyen');
-            // $arr["avatar"] = $uploadedAvatar->getPublicId();
             $arr['avatar'] = $path;
         }
         $story = Story::create($arr);
@@ -115,6 +114,7 @@ class StoryController extends Controller
         $story->load([
             "converter:id,name",
             "genres:id,name,type,slug",
+            "author:id,name,slug"
 
 
         ])
@@ -168,7 +168,7 @@ class StoryController extends Controller
             "description",
             "status",
             "view",
-            "author_name"
+            "author_id"
         ]);
         if ($request->has("genres_id")) {
             $genres_id = $request->get("genres_id");
@@ -183,8 +183,6 @@ class StoryController extends Controller
             }
         }
         $story->update($arr);
-        $story->slug = SlugService::createSlug(Story::class, 'slug', $story->name);
-        $story->save();
         return $this->success([
             "data" => $story,
         ]);
@@ -203,12 +201,17 @@ class StoryController extends Controller
     public function adminIndex(Request $request)
     {
         $userId = auth()->id();
-        $stories = Story::query()
-            ->with([
-                "genres:id,name,type"
-            ])
+        $stories = Story::with([
+            "genres:id,name,type",
+            "author:id,name,slug"
+        ])
             ->whereUserId($userId)
-            ->get();
+            ->paginate(10);
+
+        $stories->append([
+            'genre',
+            'truncate_description'
+        ]);
         return $this->success([
             "data" => $stories
         ]);
@@ -218,6 +221,7 @@ class StoryController extends Controller
         $story->load([
             "converter:id,name",
             "genres:id,name,type",
+            "author:id,name"
 
         ]);
         return $this->success([
