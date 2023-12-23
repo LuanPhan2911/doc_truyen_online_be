@@ -126,7 +126,7 @@ class Story extends Model
     {
         return Chapter::query()->whereStoryId($this->id)->latest()->first(['name', 'index']);
     }
-    public function getTruncateDescriptionAttribute(): string
+    public function getTruncateDescriptionAttribute()
     {
         return Str::limit($this->description);
     }

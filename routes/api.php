@@ -9,7 +9,6 @@ use App\Http\Controllers\RateStoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
-use App\Models\Story;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,69 +43,101 @@ Route::group([
 
     Route::get("/notifies",  "notifies");
     Route::post("/notifies/{story}",  "updateNotifies");
-    Route::get("/stories",  "storiesReading");
-    Route::get("/stories/paginate", "storiesReadingPaginate");
-    Route::delete('/stories/{story}',  "destroyReading");
+    Route::get("/marking/{story:slug}/chapter/{index}",  "updateStoryMarking");
+    Route::get("/stories",  "getStoriesReading");
+    Route::get("/stories/reading/paginate", "getStoriesReadingPaginate");
+    Route::get("/stories/marking/paginate", "getStoriesMarkingPaginate");
+    Route::delete('/stories/reading/{story}',  "destroyStoryReading");
+    Route::delete('/stories/marking/{story}',  "destroyStoryMarking");
     Route::post('/{user}',  "update");
     Route::get('/{user}', "show");
 });
 
 
 Route::group([
-    'prefix' => 'genres'
+    'prefix' => 'genres',
+    'controller' => GenreController::class
 ], function () {
-    Route::post('/create', [GenreController::class, 'store']);
-    Route::post('/{genre}/edit', [GenreController::class, 'update']);
-    Route::delete("/{genre}/delete", [GenreController::class, 'destroy']);
-    Route::get('/', [GenreController::class, 'index']);
+    Route::post('/create',  'store');
+    Route::post('/{genre}/edit',  'update');
+    Route::delete("/{genre}/delete",  'destroy');
+    Route::get('/',  'index');
 });
 Route::group([
-    'prefix' => '/admin/authors'
+    'prefix' => '/admin/authors',
+    'controller' => AuthorController::class
 ], function () {
-    Route::post('/create', [AuthorController::class, 'store']);
-    Route::get('/', [AuthorController::class, 'index']);
+    Route::post('/create',  'store');
+    Route::get('/', 'index');
 });
 Route::group([
-    'prefix' => 'stories'
+    'prefix' => '/authors',
+    'controller' => AuthorController::class
+], function () {
+    Route::get('/{author:slug}/show',  'show');
+});
+Route::group([
+    'prefix' => 'stories',
+    'controller' => StoryController::class
 ], function () {
 
-    Route::get('/', [StoryController::class, 'index']);
-    Route::get("/{story:slug}", [StoryController::class, 'show']);
-    Route::get("/{story:slug}/chapter", [ChapterController::class, "index"]);
-    Route::get("/{story:slug}/chapter/{index}", [ChapterController::class, "show"]);
-    Route::post("/{story:slug}/chapter/{index}/reaction", [ChapterController::class, "reaction"]);
-    Route::post("/{story:slug}/rate", [RateStoryController::class, "store"]);
+    Route::get('/', 'index');
+    Route::get("/{story:slug}",  'show');
 });
 Route::group([
-    'prefix' => 'chapters'
+    'prefix' => 'stories/{story:slug}',
+    'controller' => RateStoryController::class
 ], function () {
-    Route::post('/create', [ChapterController::class, 'store']);
-    Route::get('/', [ChapterController::class, 'index']);
+    Route::post("/rate",  "store");
+});
+
+Route::group([
+    'prefix' => 'stories/{story:slug}/chapter',
+    'controller' => ChapterController::class,
+], function () {
+    Route::get("/",  "index");
+    Route::get("/{index}", "show");
+    Route::post("/{index}/reaction",  "reaction");
 });
 Route::group([
-    "prefix" => "admin/stories"
+    'prefix' => 'chapters',
+    'controller' => ChapterController::class
 ], function () {
-    Route::post('/create', [StoryController::class, 'store']);
-    Route::get("/", [StoryController::class, "adminIndex"]);
-    Route::post("/{id}/update", [StoryController::class, "update"]);
-    Route::get("/{story}/show", [StoryController::class, 'adminShow']);
-    Route::post("/{story}/chapters/create", [ChapterController::class, "store"]);
-    Route::post("/chapters/{chapterId}", [ChapterController::class, "update"]);
-    Route::get("/{story}/chapters/{index}", [ChapterController::class, "adminShow"]);
-    Route::get("/{story}/chapters", [ChapterController::class, "index"]);
+    Route::post('/create', 'store');
+    Route::get('/',  'index');
 });
 Route::group([
-    "prefix" => "comments"
+    "prefix" => "admin/stories",
+    "controller" => StoryController::class
 ], function () {
-    Route::post("/create", [CommentController::class, "store"])->middleware('auth:sanctum');
-    Route::get("/", [CommentController::class, "index"]);
-    Route::post("/{comment}/like", [CommentController::class, "like"])->middleware('auth:sanctum');
-    Route::delete("{comment}", [CommentController::class, "destroy"]);
+    Route::post('/create',  'store');
+    Route::get("/",  "adminIndex");
+    Route::post("/{story:slug}/update",  "update");
+    Route::get("/{story:slug}/show",  'adminShow');
+});
+Route::group([
+    "prefix" => "admin/stories/{story:slug}/chapters",
+    "controller" => ChapterController::class
+], function () {
+    Route::post("/create",  "store");
+    Route::post("/{index}/update",  "update");
+    Route::get("/{index}",  "adminShow");
+    Route::get("/",  "index");
+});
+Route::group([
+    "prefix" => "comments",
+    'controller' => CommentController::class
+], function () {
+    Route::post("/create", "store")->middleware('auth:sanctum');
+    Route::get("/",  "index");
+    Route::post("/{comment}/like",  "like")->middleware('auth:sanctum');
+    Route::delete("{comment}", "destroy");
 });
 Route::group([
     "prefix" => "reports",
+    "controller" => ReportController::class
     // "middleware" => "auth:sanctum"
 ], function () {
-    Route::post("/create", [ReportController::class, "store"]);
-    Route::get("/", [ReportController::class, "index"]);
+    Route::post("/create", "store");
+    Route::get("/",  "index");
 });

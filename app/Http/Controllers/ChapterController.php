@@ -93,11 +93,12 @@ class ChapterController extends Controller
     public function show(Story $story, $index)
     {
 
-        $chapter = Chapter::query()
-            ->with([
-                "story:id,author_name,name",
-                "reactions"
-            ])
+        $chapter = Chapter::with([
+            "story:id,name,author_id" => [
+                'author:id,name'
+            ],
+            "reactions"
+        ])
             ->where([
                 ["story_id", $story->id],
                 ["index", $index]
@@ -114,8 +115,8 @@ class ChapterController extends Controller
                 'is_seen' => 1
             ]);
 
-            $hasStory = $user->stories->where('id', $story->id)->count() > 0;
-            if ($hasStory) {
+            $hasStory = $user->stories->where('id', $story->id)->isEmpty();
+            if (!$hasStory) {
                 $user->stories()->updateExistingPivot(
                     $story->id,
                     [
@@ -129,7 +130,6 @@ class ChapterController extends Controller
                     $story->id,
                     [
                         "index" => $index,
-                        "reading_deleted_at" => NULL,
                         "created_at" => Date::now(),
                         "updated_at" => Date::now()
                     ],
@@ -183,15 +183,14 @@ class ChapterController extends Controller
      * @param  \App\Models\Chapter  $chapter
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateChapterRequest $request, $chapterId)
+    public function update(UpdateChapterRequest $request, Story $story, $index)
     {
 
-        $chapter = Chapter::query()
-            ->find($chapterId);
-        $arr = $request->only([
-            "name",
-            "content",
-        ]);
+        $chapter = Chapter::whereStoryId($story->id)
+            ->whereIndex($index)
+            ->first();
+
+        $arr = $request->validated();
         $chapter->update($arr);
         return $this->success([
             "data" => $chapter,

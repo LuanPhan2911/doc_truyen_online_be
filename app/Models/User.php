@@ -60,7 +60,10 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot([
                 'index',
                 'reading_deleted_at',
-                'notified'
+                'marking_deleted_at',
+                'notified',
+                'marked',
+                'marked_index'
             ])
             ->withTimestamps();
     }

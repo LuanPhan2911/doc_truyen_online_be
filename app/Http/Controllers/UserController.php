@@ -48,7 +48,7 @@ class UserController extends Controller
             "data" => $user,
         ]);
     }
-    public function storiesReading()
+    public function getStoriesReading()
     {
 
         $user = request()->user();
@@ -72,7 +72,7 @@ class UserController extends Controller
                 ->values()
                 ->take(5);
             $stories = $stories_auth;
-            if (empty($stories_auth)) {
+            if ($stories_auth->isEmpty()) {
                 $stories = $stories_not_auth;
             }
         } else {
@@ -82,13 +82,51 @@ class UserController extends Controller
             "data" => $stories
         ]);
     }
-    public function destroyReading(Story $story)
+    public function destroyStoryReading(Story $story)
     {
         $user = Auth::user();
         $user->stories()->updateExistingPivot(
             $story->id,
             ["reading_deleted_at" => Date::now()]
         );
+        return $this->success();
+    }
+    public function destroyStoryMarking(Story $story)
+    {
+        $user = Auth::user();
+        $user->stories()->updateExistingPivot(
+            $story->id,
+            ["marking_deleted_at" => Date::now()]
+        );
+        return $this->success();
+    }
+    public function updateStoryMarking(Story $story, $index)
+    {
+        $user = Auth::user();
+        $hasStory = $user->stories->where('id', $story->id)->count() > 0;
+        if ($hasStory) {
+            $user->stories()->updateExistingPivot(
+                $story->id,
+                [
+                    "marked" => 1,
+                    "marked_index" => $index,
+                    "updated_at" => Date::now()
+                ]
+            );
+        } else {
+            $user->stories()->attach(
+                $story->id,
+                [
+                    "marked_index" => $index,
+                    "marked" => 1,
+                    "index" => 1,
+                    "reading_deleted_at" => Date::now(),
+                    "created_at" => Date::now(),
+                    "updated_at" => Date::now()
+                ],
+
+            );
+        }
         return $this->success();
     }
     public function updateNotifies(User $user, Story $story)
@@ -101,11 +139,29 @@ class UserController extends Controller
         ]);
         return $this->success();
     }
-    public function storiesReadingPaginate()
+    public function getStoriesReadingPaginate()
     {
         if (Auth::check()) {
             $user = User::find(Auth::id());
             $stories_paginate = $user->stories()
+                ->wherePivotNull('reading_deleted_at')
+                ->withCount('chapters')
+                ->paginate(10);
+            $stories_paginate->makeHidden([
+                'description'
+            ]);
+            return $this->success([
+                'data' => $stories_paginate
+            ]);
+        }
+        return $this->failure();
+    }
+    public function getStoriesMarkingPaginate()
+    {
+        if (Auth::check()) {
+            $user = User::find(Auth::id());
+            $stories_paginate = $user->stories()
+                ->wherePivot('marked', 1)
                 ->withCount('chapters')
                 ->paginate(10);
             $stories_paginate->makeHidden([

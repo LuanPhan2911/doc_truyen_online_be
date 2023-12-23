@@ -55,7 +55,23 @@ class AuthorController extends Controller
      */
     public function show(Author $author)
     {
-        //
+        $author->load(
+            [
+                'stories:id,name,slug,avatar,author_id,description' => [
+                    'author:id,name,slug'
+                ]
+            ]
+        );
+        $author->stories->append([
+            'genre',
+            'truncate_description'
+        ]);
+        $author->stories->makeHidden([
+            'description'
+        ]);
+        return $this->success([
+            'data' => $author
+        ]);
     }
 
     /**

@@ -220,7 +220,7 @@ namespace App\Models{
  * @property-read mixed $rate_comments_count
  * @property-read mixed $rate_story
  * @property-read mixed $reaction_summary
- * @property-read string $truncate_description
+ * @property-read mixed $truncate_description
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Report> $reports
  * @property-read int|null $reports_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
