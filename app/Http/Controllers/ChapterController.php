@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChapterCreatedNotifies;
 use App\Models\Chapter;
 use App\Http\Requests\StoreChapterRequest;
 use App\Http\Requests\UpdateChapterRequest;
@@ -65,6 +66,9 @@ class ChapterController extends Controller
         $arr["index"] = $index;
         $arr["story_id"] = $story?->id;
         $chapter = Chapter::create($arr);
+        // ChapterCreatedNotifies::dispatch(
+        //     $story
+        // );
         return $this->success([
             'data' => $chapter
         ]);
@@ -108,9 +112,9 @@ class ChapterController extends Controller
         $countChapter = Chapter::query()->where("story_id", $story->id)->count();
         $reactionSummary = $chapter?->getReactionsSummary();
 
+
         if (Auth::check()) {
             $user = User::find(Auth::id());
-
             $user->chapters()->updateExistingPivot($chapter->id, [
                 'is_seen' => 1
             ]);

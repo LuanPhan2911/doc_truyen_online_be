@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Auth;
 
-use Illuminate\Contracts\Validation\Validator;
+use App\Models\User;
+use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
 class EmailVerifyNotificationRequest extends FormRequest
 {
+    use PreventRedirectIfValidateFailed;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -27,17 +28,12 @@ class EmailVerifyNotificationRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => Rule::exists(User::class, 'email')
-        ];
-    }
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json(
-            [
-                'errors' => $validator->errors(),
-                'success' => false,
+            'email' => [
+                'bail',
+                'required',
+                'email',
+                Rule::exists('users:email'),
             ],
-            400
-        ));
+        ];
     }
 }

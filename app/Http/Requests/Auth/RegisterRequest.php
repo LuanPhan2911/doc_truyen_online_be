@@ -28,6 +28,10 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => [
+                'bail',
+                'required',
+            ],
             'email' => [
                 'bail',
                 'required',
@@ -39,11 +43,12 @@ class RegisterRequest extends FormRequest
                 'min:1',
                 'required',
             ],
-            'confirmPassword' => [
-                'bail',
+            'device_name' => [
                 'required',
-                'same:password'
-            ]
+                'in:web,mobile',
+                'bail',
+            ],
+
         ];
     }
 }

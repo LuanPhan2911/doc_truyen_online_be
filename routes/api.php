@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     "controller" => AuthController::class
 ], function () {
-    Route::get('/get_user',  'user')->middleware('auth:sanctum');
+    Route::get('/user',  'user')->middleware('auth:sanctum');
     Route::post('/login',  'login');
     Route::post('/register',  'register');
     Route::get('/logout',  'logout')->middleware('auth:sanctum');
@@ -38,18 +38,16 @@ Route::group([
 
 Route::group([
     "prefix" => "users",
-    "controller" => UserController::class
+    "controller" => UserController::class,
+    "middleware" => "auth:sanctum",
 ], function () {
-
+    Route::post('/edit',  "update");
     Route::get("/notifies",  "notifies");
     Route::post("/notifies/{story}",  "updateNotifies");
     Route::get("/marking/{story:slug}/chapter/{index}",  "updateStoryMarking");
     Route::get("/stories",  "getStoriesReading");
     Route::get("/stories/reading/paginate", "getStoriesReadingPaginate");
-    Route::get("/stories/marking/paginate", "getStoriesMarkingPaginate");
     Route::delete('/stories/reading/{story}',  "destroyStoryReading");
-    Route::delete('/stories/marking/{story}',  "destroyStoryMarking");
-    Route::post('/{user}',  "update");
     Route::get('/{user}', "show");
 });
 

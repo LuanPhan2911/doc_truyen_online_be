@@ -10,10 +10,8 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -23,84 +21,64 @@ class AuthController extends Controller
     use ResponseTrait;
     public function user(Request $request)
     {
-        $user = $request->user();
-        if (empty($user)) {
-            return $this->failure();
-        }
+
         return $this->success([
-            "data" => $user,
+            "data" => $request->user(),
         ]);
     }
     public function register(RegisterRequest $request)
     {
-        try {
-            $arr = $request->all();
-            $arr['password'] = Hash::make($request->password);
-            $user = User::create($arr);
 
-            event(new Registered($user));
-            return $this->success([
-                'message' => "Register success!",
-                "data" => $user,
-            ]);
-        } catch (\Throwable $th) {
-            return $this->failure([]);
-            //throw $th;
-        }
+        $arr = $request->validated();
+        $arr['password'] = Hash::make($request->password);
+        $user = User::create($arr);
+
+        $token = $user->createToken($request->device_name)->plainTextToken;
+        return $this->success([
+            'message' => "User Register Success!",
+            'token' => $token
+        ]);
     }
     public function login(LoginRequest $request)
     {
-        try {
-            $credentials = $request->only(['email', 'password']);
-            $rememberMe = $request->get("rememberMe");
-            if (!Auth::attempt($credentials, $rememberMe)) {
-                return $this->failure([
-                    'error' => [],
-                    'message' => "Email or password not found!"
-                ]);
-            }
-
-            $user = User::where('email', $request->email)->first();
-
-            $token = $user->createToken('access_token')->plainTextToken;
-            return $this->success([
-                'token' => $token,
-                'message' => "User login success",
-                "data" => $user,
-            ]);
-        } catch (\Exception $error) {
+        $user = User::where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return $this->failure(
-                [
-                    'error' => $error,
-                    'message' => 'User login fail'
-                ]
+                ['message' => 'The provided credentials are incorrect',]
             );
         }
+        $token = $user->createToken($request->device_name)->plainTextToken;
+        return $this->success([
+            'token' => $token,
+            'message' => "User login success",
+
+
+        ]);
     }
 
     public function logout(Request $request)
     {
-        $user = $request->user();
-        Auth::guard('web')->logout();
-        $user->tokens()->delete();
+
+        $request->user()->currentAccessToken()->delete();
         return $this->success(
             [
-                'message' => "User logout success!"
+                'message' => "User logout success!",
+
+
             ]
         );
     }
 
     public function emailVerifyNotification(EmailVerifyNotificationRequest $request)
     {
-        try {
-            $user = $request->user();
-            if (empty($user)) {
-                $user = User::query()->where('email', $request->email)->first();
-            }
+
+
+        $user = User::query()->where('email', $request->email)->first();
+        if (isset($user)) {
             $user->sendEmailVerificationNotification();
             return $this->success();
-        } catch (\Throwable $th) {
-            return $this->failure();
+        } else {
+            return $this->failure(['message' => 'Email not found!']);
         }
     }
     public function emailVerifyAccept(EmailVerificationRequest $request)

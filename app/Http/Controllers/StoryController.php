@@ -56,7 +56,7 @@ class StoryController extends Controller
         if ($request->has("filter")) {
             $stories =  $query->paginate(10);
         } else {
-            $stories = $query->limit(8)->get();
+            $stories = $query->limit(6)->get();
         }
         $stories->makeHidden('description');
         $stories->append(['truncate_description', 'genre']);

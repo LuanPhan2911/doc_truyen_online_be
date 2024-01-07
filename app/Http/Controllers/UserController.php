@@ -21,25 +21,27 @@ class UserController extends Controller
             "data" => $user
         ]);
     }
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request)
     {
+        $user = $request->user();
+        if (empty($user)) {
+            return $this->failure([
+                'message' => 'Unauthorized',
+            ]);
+        }
         $arr = $request->only([
             "name",
             "description",
             "birth_date",
             "gender"
-
         ]);
 
         if ($request->hasFile("avatar")) {
             $path = Storage::disk("public")->put('users', $request->file('avatar'));
-            // Cloudinary::uploadApi();
-            // $uploadedAvatar = $request->file('avatar')->storeOnCloudinary('stop_truyen');
-            // $arr["avatar"] = $uploadedAvatar->getPublicId();
+
             $arr['avatar'] = $path;
             if (!empty($user->avatar)) {
                 Storage::disk("public")->delete($user->avatar);
-                // Cloudinary::destroy($user->getRawOriginal('avatar'));
             }
         }
         $user->update($arr);
@@ -48,36 +50,24 @@ class UserController extends Controller
             "data" => $user,
         ]);
     }
-    public function getStoriesReading()
+    public function getStoriesReading(Request $request)
     {
 
-        $user = request()->user();
-        $stories = null;
-        $stories_not_auth = Story::query()
-            ->withCount('chapters')
-            ->latest()
-            ->limit(5)
-            ->get();
-        if (!empty($user)) {;
-            $user->load([
-                "stories:id,name,avatar,slug,updated_at"
-            ]);
+        $user = $request->user();
 
-            $stories_auth = $user->stories
-                ->loadCount('chapters')
-                ->whereNull('pivot.reading_deleted_at')
-                ->sortBy([
-                    ['pivot.updated_at', 'desc']
-                ])
-                ->values()
-                ->take(5);
-            $stories = $stories_auth;
-            if ($stories_auth->isEmpty()) {
-                $stories = $stories_not_auth;
-            }
-        } else {
-            $stories = $stories_not_auth;
-        }
+        $user->load([
+            "stories:id,name,avatar,slug,updated_at"
+        ]);
+
+        $stories = $user->stories
+            ->loadCount('chapters')
+            ->whereNull('pivot.reading_deleted_at')
+            ->sortBy([
+                ['pivot.updated_at', 'desc']
+            ])
+            ->values()
+            ->take(5);
+
         return $this->success([
             "data" => $stories
         ]);
@@ -89,44 +79,6 @@ class UserController extends Controller
             $story->id,
             ["reading_deleted_at" => Date::now()]
         );
-        return $this->success();
-    }
-    public function destroyStoryMarking(Story $story)
-    {
-        $user = Auth::user();
-        $user->stories()->updateExistingPivot(
-            $story->id,
-            ["marking_deleted_at" => Date::now()]
-        );
-        return $this->success();
-    }
-    public function updateStoryMarking(Story $story, $index)
-    {
-        $user = Auth::user();
-        $hasStory = $user->stories->where('id', $story->id)->count() > 0;
-        if ($hasStory) {
-            $user->stories()->updateExistingPivot(
-                $story->id,
-                [
-                    "marked" => 1,
-                    "marked_index" => $index,
-                    "updated_at" => Date::now()
-                ]
-            );
-        } else {
-            $user->stories()->attach(
-                $story->id,
-                [
-                    "marked_index" => $index,
-                    "marked" => 1,
-                    "index" => 1,
-                    "reading_deleted_at" => Date::now(),
-                    "created_at" => Date::now(),
-                    "updated_at" => Date::now()
-                ],
-
-            );
-        }
         return $this->success();
     }
     public function updateNotifies(User $user, Story $story)

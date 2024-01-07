@@ -15,6 +15,7 @@ trait PreventRedirectIfValidateFailed
             [
                 'errors' => $errors,
                 'success' => false,
+                'message' => "Some invalid data existed!"
             ],
             400
         ));
