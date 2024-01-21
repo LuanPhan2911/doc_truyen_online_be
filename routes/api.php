@@ -42,12 +42,13 @@ Route::group([
     "middleware" => "auth:sanctum",
 ], function () {
     Route::post('/edit',  "update");
-    Route::get("/notifies",  "notifies");
-    Route::post("/notifies/{story}",  "updateNotifies");
-    Route::get("/marking/{story:slug}/chapter/{index}",  "updateStoryMarking");
-    Route::get("/stories",  "getStoriesReading");
+
+    Route::post("/stories/{story}/notifies",  "updateStoryNotifies");
     Route::get("/stories/reading/paginate", "getStoriesReadingPaginate");
-    Route::delete('/stories/reading/{story}',  "destroyStoryReading");
+    Route::get("/stories/marking/paginate", "getStoriesMarkingPaginate");
+    Route::post("/stories/{story}/marking/create", "createStoryMarking");
+    Route::delete('/stories/{story}/reading/delete',  "destroyStoryReading");
+    Route::delete('/stories/{story}/marking/delete',  "destroyStoryMarking");
     Route::get('/{user}', "show");
 });
 
@@ -61,6 +62,8 @@ Route::group([
     Route::delete("/{genre}/delete",  'destroy');
     Route::get('/',  'index');
 });
+
+
 Route::group([
     'prefix' => '/admin/authors',
     'controller' => AuthorController::class
@@ -74,20 +77,25 @@ Route::group([
 ], function () {
     Route::get('/{author:slug}/show',  'show');
 });
+
+
 Route::group([
     'prefix' => 'stories',
     'controller' => StoryController::class
 ], function () {
 
     Route::get('/', 'index');
+    Route::get("/filter", "getFilterStory");
     Route::get("/{story:slug}",  'show');
 });
+
 Route::group([
     'prefix' => 'stories/{story:slug}',
     'controller' => RateStoryController::class
 ], function () {
     Route::post("/rate",  "store");
 });
+
 
 Route::group([
     'prefix' => 'stories/{story:slug}/chapter',
@@ -97,16 +105,18 @@ Route::group([
     Route::get("/{index}", "show");
     Route::post("/{index}/reaction",  "reaction");
 });
+
 Route::group([
     'prefix' => 'chapters',
     'controller' => ChapterController::class
 ], function () {
-    Route::post('/create', 'store');
     Route::get('/',  'index');
 });
+
 Route::group([
     "prefix" => "admin/stories",
-    "controller" => StoryController::class
+    "controller" => StoryController::class,
+    "middleware" => "auth:sanctum",
 ], function () {
     Route::post('/create',  'store');
     Route::get("/",  "adminIndex");
@@ -115,22 +125,27 @@ Route::group([
 });
 Route::group([
     "prefix" => "admin/stories/{story:slug}/chapters",
-    "controller" => ChapterController::class
+    "controller" => ChapterController::class,
+    "middleware" => "auth:sanctum",
 ], function () {
     Route::post("/create",  "store");
     Route::post("/{index}/update",  "update");
     Route::get("/{index}",  "adminShow");
     Route::get("/",  "index");
 });
+
 Route::group([
     "prefix" => "comments",
     'controller' => CommentController::class
 ], function () {
     Route::post("/create", "store")->middleware('auth:sanctum');
     Route::get("/",  "index");
+    Route::get("/replies", "getRelies");
     Route::post("/{comment}/like",  "like")->middleware('auth:sanctum');
     Route::delete("{comment}", "destroy");
 });
+
+
 Route::group([
     "prefix" => "reports",
     "controller" => ReportController::class

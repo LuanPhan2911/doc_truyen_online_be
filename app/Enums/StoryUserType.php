@@ -13,6 +13,6 @@ use BenSampo\Enum\Enum;
  */
 final class StoryUserType extends Enum
 {
-    const Reading = 1;
-    const Marking = 2;
+    public const READING = 1;
+    public const MARKING = 2;
 }

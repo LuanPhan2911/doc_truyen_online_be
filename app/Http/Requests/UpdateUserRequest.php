@@ -28,7 +28,7 @@ class UpdateUserRequest extends FormRequest
         return [
             "name" => ["bail", "string",],
             "description" => ["string", "nullable"],
-            "gender" => ["boolean", "nullable"],
+            "gender" => ["nullable"],
             "avatar" => ["image",  "max:10240", "nullable"],
             "birth_date" => ["nullable",]
         ];

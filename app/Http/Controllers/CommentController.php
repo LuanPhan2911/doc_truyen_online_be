@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TypeCommentEnum;
 use App\Models\Comment;
 use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateCommentRequest;
 
 use App\Models\Story;
@@ -25,18 +26,12 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $story_id = $request->get("story_id");
-        $type = $request->get("type") ?? TypeCommentEnum::COMMENT;
         $comments = Comment::query()
             ->with([
-                "replies" => [
-                    "user:id,name,avatar"
-                ],
                 "user:id,name,avatar",
                 "likeCounter:id,likeable_id,count",
-                "rateStory:comment_id,plot,world_building,quality_convert,characteristic"
             ])
             ->withCount("replies")
-            ->whereType($type)
             ->whereHasMorph(
                 'commentable',
                 [Story::class],
@@ -53,8 +48,21 @@ class CommentController extends Controller
 
         return $this->success([
             "data" => $comments,
+        ]);
+    }
+    public function getRelies(Request $request)
+    {
+        $comment_id = $request->get("comment_id");
+        $comments = Comment::query()
+            ->with([
+                "user:id,name,avatar",
+                "likeCounter:id,likeable_id,count",
+            ])
+            ->whereParentId($comment_id)
+            ->cursorPaginate(10);
 
-
+        return $this->success([
+            'data' => $comments
         ]);
     }
 
@@ -76,18 +84,21 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
+        $user = $request->user('sanctum');
         $arr = $request->only([
             "message",
-            "user_id",
             'is_leak',
             'type'
         ]);
-        $commentedId = $request->get("commentedId");
+        $arr['user_id'] = $user->id;
+        $commentedId = $request->get("commentable_id");
         $commentable_type = $request->get("commentable_type");
-        $parent_id = $request->input("parent_id");
+        $parent_id = $request->get("parent_id");
 
         $comment = new Comment($arr);
         $comment->parent_id = $parent_id;
+
+
         $morphClass = null;
         switch ($commentable_type) {
             case 'story':
@@ -105,13 +116,7 @@ class CommentController extends Controller
                 "user:id,name,avatar",
                 "likeCounter:id,likeable_id,count"
             ]);
-            if (!$comment->parent_id) {
-                $comment->load([
-                    "replies" => [
-                        "user:id,name,avatar"
-                    ],
-                ]);
-            }
+            $comment->loadCount('replies');
             return $this->success([
                 "data" => $comment,
             ]);
@@ -176,18 +181,22 @@ class CommentController extends Controller
             "message" => "Delete fail"
         ]);
     }
-    public function like(Comment $comment)
+    public function like(Request $request, Comment $comment)
     {
-        $userId = request()->user()->id;
-        if ($comment->liked($userId)) {
-            $comment->unlike($userId);
+        $user = $request->user('sanctum');
+        if ($comment->liked($user->id)) {
+            $comment->unlike($user->id);
             return $this->success([
-                "data" => "unlike"
+                "data" => [
+                    'action' => 'unlike'
+                ]
             ]);
         }
         $comment->like();
         return $this->success([
-            "data" => "like"
+            "data" => [
+                'action' => 'like'
+            ]
         ]);
     }
 }

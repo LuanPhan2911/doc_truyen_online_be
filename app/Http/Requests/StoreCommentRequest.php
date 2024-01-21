@@ -36,22 +36,14 @@ class StoreCommentRequest extends FormRequest
             "parent_id" => [
                 "nullable"
             ],
-            'user_id' => [
-                "required",
-                Rule::exists(User::class, "id")
-            ],
-            "commentedId" => [
+            "commentable_id" => [
                 "required",
             ],
             "commentable_type" => [
                 "required",
             ],
-            'type' => [
-                'required',
-                Rule::in(TypeCommentEnum::getValues()),
-            ],
             'is_leak' => [
-                'required',
+                'nullable',
                 'boolean'
             ]
         ];

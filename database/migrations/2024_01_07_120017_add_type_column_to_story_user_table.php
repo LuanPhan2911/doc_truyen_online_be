@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('story_user', function (Blueprint $table) {
-            $table->tinyInteger("type")->after("index")->default(StoryUserType::Reading)->comment("StoryUserTypeEnum");
+            $table->tinyInteger("type")->after("index")->default(StoryUserType::READING)->comment("StoryUserTypeEnum");
         });
     }
 

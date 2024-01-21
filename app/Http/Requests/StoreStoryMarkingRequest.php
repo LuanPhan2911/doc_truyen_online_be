@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\GenreType;
 use App\Traits\PreventRedirectIfValidateFailed;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class GetGenreRequest extends FormRequest
+class StoreStoryMarkingRequest extends FormRequest
 {
     use PreventRedirectIfValidateFailed;
     /**
@@ -28,10 +26,9 @@ class GetGenreRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => [
-                'bail',
+            'index' => [
                 'nullable',
-                Rule::in(GenreType::getValues()),
+                'integer'
             ]
         ];
     }

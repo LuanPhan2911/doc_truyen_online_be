@@ -34,19 +34,6 @@ class Story extends Model
     public function getCommentsCountAttribute()
     {
         return Comment::query()
-            ->whereType(TypeCommentEnum::COMMENT)
-            ->whereHasMorph(
-                'commentable',
-                [Story::class],
-                function ($query) {
-                    $query->where('id', $this->id);
-                }
-            )->count();
-    }
-    public function getRateCommentsCountAttribute()
-    {
-        return Comment::query()
-            ->whereType(TypeCommentEnum::RATING)
             ->whereHasMorph(
                 'commentable',
                 [Story::class],
@@ -80,46 +67,45 @@ class Story extends Model
     }
     public function getRateStoryAttribute()
     {
-        $comments = Comment::query()
-            ->whereType(TypeCommentEnum::RATING)
-            ->whereHasMorph(
-                'commentable',
-                [Story::class],
-                function ($query) {
-                    $query->where('id', $this->id);
-                }
-            )->get();
-        $rateStory = collect();
-        $rate = [
-            'characteristic',
-            'plot',
-            'world_building',
-            'quality_convert'
-        ];
-        foreach ($comments as $comment) {
-            $rateStory->push($comment->rateStory->only(
-                $rate
-            ));
-        }
-        $avgStory = [];
-        foreach ($rate as $value) {
-            $avgStory[$value] = $rateStory->avg($value);
-        };
+        // $comments = Comment::query()
+        //     ->whereType(TypeCommentEnum::RATING)
+        //     ->whereHasMorph(
+        //         'commentable',
+        //         [Story::class],
+        //         function ($query) {
+        //             $query->where('id', $this->id);
+        //         }
+        //     )->get();
+        // $rateStory = collect();
+        // $rate = [
+        //     'characteristic',
+        //     'plot',
+        //     'world_building',
+        //     'quality_convert'
+        // ];
+        // foreach ($comments as $comment) {
+        //     $rateStory->push($comment->rateStory->only(
+        //         $rate
+        //     ));
+        // }
+        // $avgStory = [];
+        // foreach ($rate as $value) {
+        //     $avgStory[$value] = $rateStory->avg($value);
+        // };
 
-        return $avgStory;
+        // return $avgStory;
     }
     public function getChapterIndexAttribute()
     {
-        if (!auth()->check()) {
+        $user = request()->user('sanctum');
+        if (!$user) {
             return null;
         } else {
             $users = $this->users;
-            $user = $users
-                ->where('id', auth()->id())
-                ->whereNull('pivot.reading_deleted_at')
-                ->first();
+            $user_reading = $users->where('id', $user->id)->first();
 
-            return empty($user) ? null : $user->pivot->index;
+
+            return $user_reading ? $user_reading->pivot->index : null;
         }
     }
     public function getNewestChapterAttribute()
@@ -145,7 +131,7 @@ class Story extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)
-            ->withPivot(["index", "notified", "reading_deleted_at"]);
+            ->withPivot(["index", "notified",]);
     }
     public function chapters()
     {

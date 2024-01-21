@@ -8,6 +8,8 @@ use App\Models\Genre;
 use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
 use App\Traits\ResponseTrait;
+use Cache;
+
 
 class GenreController extends Controller
 {
@@ -17,21 +19,17 @@ class GenreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(GetGenreRequest $request)
+    public function index()
     {
-        $arr = [];
-        $query = Genre::query()->select(['name', 'id', 'type', 'slug']);
-        if ($request->has('type')) {
-
-            $type = intval($request->type);
-            $query->where('type', $type);
-            $arr = $query->get();
-        } else {
-            $arr = $query->get();
-        }
+        $genres = Cache::remember('genres', 60, function () {
+            return Genre::get();
+        });
+        $data = $genres->groupBy(function ($item,  $key) {
+            return GenreType::getKey($item['type']);
+        })->all();
 
         return $this->success([
-            'data' => $arr
+            'data' => $data
         ]);
     }
 

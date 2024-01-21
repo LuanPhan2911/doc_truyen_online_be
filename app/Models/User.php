@@ -48,6 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'gender' => 'integer'
     ];
     public function reports()
     {
@@ -56,13 +57,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function stories()
     {
         return $this->belongsToMany(Story::class)
+            ->as('story_user')
             ->withPivot([
                 'index',
-                'reading_deleted_at',
-                'marking_deleted_at',
                 'notified',
-                'marked',
-                'marked_index'
+                'type'
             ])
             ->withTimestamps();
     }

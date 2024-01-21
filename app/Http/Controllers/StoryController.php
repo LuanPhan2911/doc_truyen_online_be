@@ -11,6 +11,7 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+
 class StoryController extends Controller
 {
     use ResponseTrait;
@@ -19,46 +20,87 @@ class StoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function getFilterStory(Request $request)
     {
-        $stories = [];
         $query = Story::query()
             ->with([
                 "genres:id,name,type",
                 "author:id,name,slug"
             ])
             ->withCount("chapters");
-        if ($request->has('orderBy')) {
-            $orderBy = $request->get("orderBy");
-            $query->orderBy("updated_at", $orderBy);
-        } else {
-            $query->orderBy("updated_at", "desc");
+        $sort_by = $request->get('sort_by') ?? "favorite";
+        switch ($sort_by) {
+            case 'newest_updated':
+
+                $query->limit(10)
+                    ->latest('updated_at');
+
+                break;
+            case 'newest_created':
+                $query->limit(10)
+                    ->latest('created_at');
+
+                break;
+            case 'favorite':
+                $query->limit(6);
+
+                break;
+
+            default:
+                $query->limit(10);
+
+                break;
+        }
+        $stories = $query->get();
+        $stories->makeHidden('description');
+        $stories->append(['truncate_description', 'genre']);
+        return $this->success(
+            [
+                'data' => $stories,
+            ]
+        );
+    }
+    public function index(Request $request)
+    {
+
+        $query = Story::with([
+            "genres:id,name,type",
+            "author:id,name,slug"
+        ])
+            ->withCount("chapters");
+
+        $sort_by = $request->get('sort_by') ?? "favorite";
+        switch ($sort_by) {
+            case 'newest_updated':
+                $query->latest('updated_at');
+
+                break;
+            case 'newest_created':
+                $query->latest('created_at');
+                break;
+            case 'favorite':
+                break;
+            default:
+                break;
         }
 
-
         if ($request->has("genres_id")) {
-
-            $genres_id = $request->get("genres_id");
+            $genres_id = explode(",", $request->get('genres_id'));
             $query->whereHas('genres', function ($q) use ($genres_id) {
                 return $q->whereIn('genre_id', $genres_id);
             });
         }
         if ($request->has("name")) {
             $name = $request->name;
-            $query->orWhere("name", "like", "%" . $name . "%");
-            $query->orWhereHas('author', function ($q) use ($name) {
-                return $q->where("name", "like", "%" . $name . "%");
-            });
+            $query->where("name", "like", "%" . $name . "%");
         }
         if ($request->has('view')) {
             $query->whereView($request->get('view'));
         }
-        if ($request->has("filter")) {
-            $stories =  $query->paginate(10);
-        } else {
-            $stories = $query->limit(6)->get();
-        }
-        $stories->makeHidden('description');
+
+        $stories = $query->paginate(10);
+
+        $stories->makeHidden(['description']);
         $stories->append(['truncate_description', 'genre']);
         return $this->success([
             'data' => $stories
@@ -113,7 +155,7 @@ class StoryController extends Controller
     {
         $story->load([
             "converter:id,name",
-            "genres:id,name,type,slug",
+            "genres:id,name,slug",
             "author:id,name,slug"
 
 
@@ -122,11 +164,10 @@ class StoryController extends Controller
 
         $story->append(
             [
+                "genre",
                 'comments_count',
                 'reaction_summary',
                 'newest_chapter',
-                'rate_comments_count',
-                'rate_story',
                 'chapter_index'
             ]
         );

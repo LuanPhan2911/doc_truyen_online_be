@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StoryUserType;
+use App\Http\Requests\StoreStoryMarkingRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Story;
 use App\Models\User;
@@ -23,12 +25,7 @@ class UserController extends Controller
     }
     public function update(UpdateUserRequest $request)
     {
-        $user = $request->user();
-        if (empty($user)) {
-            return $this->failure([
-                'message' => 'Unauthorized',
-            ]);
-        }
+        $user = $request->user('sanctum');
         $arr = $request->only([
             "name",
             "description",
@@ -50,103 +47,115 @@ class UserController extends Controller
             "data" => $user,
         ]);
     }
-    public function getStoriesReading(Request $request)
+    public function destroyStoryReading(Request $request, Story $story)
     {
-
-        $user = $request->user();
-
-        $user->load([
-            "stories:id,name,avatar,slug,updated_at"
-        ]);
-
-        $stories = $user->stories
-            ->loadCount('chapters')
-            ->whereNull('pivot.reading_deleted_at')
-            ->sortBy([
-                ['pivot.updated_at', 'desc']
-            ])
-            ->values()
-            ->take(5);
-
-        return $this->success([
-            "data" => $stories
-        ]);
-    }
-    public function destroyStoryReading(Story $story)
-    {
-        $user = Auth::user();
-        $user->stories()->updateExistingPivot(
-            $story->id,
-            ["reading_deleted_at" => Date::now()]
-        );
+        $user = $request->user('sanctum');
+        $user->stories()->wherePivot('type', StoryUserType::READING)
+            ->detach($story->id);
         return $this->success();
     }
-    public function updateNotifies(User $user, Story $story)
+    public function destroyStoryMarking(Request $request, Story $story)
     {
-
-        $user = User::find(Auth::id());
-        $storyNotify = $user->stories()->where('stories.id', $story->id)->first();
-        $user->stories()->updateExistingPivot($story->id, [
-            'notified' => !boolval($storyNotify?->pivot?->notified)
-        ]);
+        $user = $request->user('sanctum');
+        $user->stories()->wherePivot('type', StoryUserType::MARKING)
+            ->detach($story->id);
         return $this->success();
     }
-    public function getStoriesReadingPaginate()
+    public function updateStoryNotifies(Request $request, Story $story)
     {
-        if (Auth::check()) {
-            $user = User::find(Auth::id());
-            $stories_paginate = $user->stories()
-                ->wherePivotNull('reading_deleted_at')
-                ->withCount('chapters')
-                ->paginate(10);
-            $stories_paginate->makeHidden([
-                'description'
+
+
+        $user = $request->user('sanctum');
+        $storyNotify = $user->stories()
+            ->wherePivot('type', StoryUserType::READING)
+            ->where([
+                ['stories.id', $story->id],
+
+            ])->first();
+
+        $is_notified = !$storyNotify?->story_user?->notified;
+        $user->stories()
+            ->wherePivot('type', StoryUserType::READING)
+            ->updateExistingPivot($story->id, [
+                'notified' => $is_notified
             ]);
-            return $this->success([
-                'data' => $stories_paginate
-            ]);
-        }
-        return $this->failure();
-    }
-    public function getStoriesMarkingPaginate()
-    {
-        if (Auth::check()) {
-            $user = User::find(Auth::id());
-            $stories_paginate = $user->stories()
-                ->wherePivot('marked', 1)
-                ->withCount('chapters')
-                ->paginate(10);
-            $stories_paginate->makeHidden([
-                'description'
-            ]);
-            return $this->success([
-                'data' => $stories_paginate
-            ]);
-        }
-        return $this->failure();
-    }
-    public function notifies()
-    {
-        $user = User::find(Auth::id());
-        $user->load([
-            'chapters:id,name,index,story_id' => [
-                'story:id,name,slug,avatar'
+        return $this->success(
+            [
+                'data' => [
+                    'action' => $is_notified ? 1 : 0
+                ],
             ]
-        ]);
-        $notifies = $user->chapters
-            ->where('pivot.is_seen', 0)
-            ->sortBy([
-                ['pivot.created_at', 'desc']
-            ])
-            ->values()
-            ->take(5);
+        );
+    }
+    public function getStoriesReadingPaginate(Request $request)
+    {
 
-        $notifies->makeHidden([
-            'pivot',
-            'story_id'
+        $user = $request->user('sanctum');
+        $stories_paginate = $user->stories()
+            ->wherePivot('type', StoryUserType::READING)
+            ->withCount('chapters')
+            ->paginate(10);
+
+        $stories_paginate->makeHidden([
+            'description'
         ]);
+
         return $this->success([
-            'data' => $notifies
+            'data' => $stories_paginate
         ]);
+
+        return $this->failure();
+    }
+    public function getStoriesMarkingPaginate(Request $request)
+    {
+        $user = $request->user('sanctum');
+        $stories_paginate = $user->stories()
+            ->wherePivot('type', StoryUserType::MARKING)
+            ->withCount('chapters')
+            ->paginate(10);
+
+        $stories_paginate->makeHidden([
+            'description'
+        ]);
+
+        return $this->success([
+            'data' => $stories_paginate
+        ]);
+
+        return $this->failure();
+    }
+    public function createStoryMarking(StoreStoryMarkingRequest $request, Story $story)
+    {
+        $index = $request->get('index') ?? 0;
+        $user = $request->user('sanctum');
+        $hasStory = $user->stories()
+            ->wherePivot('type', StoryUserType::MARKING)
+            ->where('stories.id', $story->id)->first();
+        if ($hasStory) {
+            $user->stories()
+                ->wherePivot('type', StoryUserType::MARKING)
+                ->updateExistingPivot(
+                    $story->id,
+                    [
+                        "index" => $index,
+                        "updated_at" => Date::now(),
+                        "type" => StoryUserType::MARKING
+
+                    ]
+                );
+        } else {
+            $user->stories()
+                ->wherePivot('type', StoryUserType::MARKING)->attach(
+                    $story->id,
+                    [
+                        "index" => $index,
+                        "created_at" => Date::now(),
+                        "updated_at" => Date::now(),
+                        "type" => StoryUserType::MARKING
+                    ],
+
+                );
+        }
+        return $this->success();
     }
 }

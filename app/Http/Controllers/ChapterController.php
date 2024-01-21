@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StoryUserType;
 use App\Events\ChapterCreatedNotifies;
 use App\Models\Chapter;
 use App\Http\Requests\StoreChapterRequest;
@@ -94,78 +95,79 @@ class ChapterController extends Controller
             'data' => $chapter
         ]);
     }
-    public function show(Story $story, $index)
+    public function show(Request $request, Story $story, $index)
     {
 
         $chapter = Chapter::with([
-            "story:id,name,author_id" => [
-                'author:id,name'
+            "story:id,name,author_id,slug" => [
+                'author:id,name',
             ],
-            "reactions"
+            // "reactions"
         ])
+
             ->where([
                 ["story_id", $story->id],
                 ["index", $index]
 
             ])->first();
-        $userReaction = null;
-        $countChapter = Chapter::query()->where("story_id", $story->id)->count();
-        $reactionSummary = $chapter?->getReactionsSummary();
+        $chapter->story->append('comments_count');
+        $chapter->story->loadCount('chapters');
 
+        $user = $request->user('sanctum');
+        if ($user) {
+            // $user->chapters()->updateExistingPivot($chapter->id, [
+            //     'is_seen' => 1
+            // ]);
 
-        if (Auth::check()) {
-            $user = User::find(Auth::id());
-            $user->chapters()->updateExistingPivot($chapter->id, [
-                'is_seen' => 1
-            ]);
+            $hasStory = $user->stories()
+                ->wherePivot('type', StoryUserType::READING)
+                ->where('stories.id', $story->id)->first();
+            if ($hasStory) {
+                $user->stories()
+                    ->wherePivot('type', StoryUserType::READING)->updateExistingPivot(
+                        $story->id,
+                        [
+                            "index" => $index,
+                            "updated_at" => Date::now(),
+                            "type" => StoryUserType::READING
 
-            $hasStory = $user->stories->where('id', $story->id)->isEmpty();
-            if (!$hasStory) {
-                $user->stories()->updateExistingPivot(
-                    $story->id,
-                    [
-                        "index" => $index,
-                        "reading_deleted_at" => NULL,
-                        "updated_at" => Date::now()
-                    ]
-                );
+                        ]
+                    );
             } else {
-                $user->stories()->attach(
-                    $story->id,
-                    [
-                        "index" => $index,
-                        "created_at" => Date::now(),
-                        "updated_at" => Date::now()
-                    ],
+                $user->stories()
+                    ->wherePivot('type', StoryUserType::READING)->attach(
+                        $story->id,
+                        [
+                            "index" => $index,
+                            "created_at" => Date::now(),
+                            "updated_at" => Date::now(),
+                            "type" => StoryUserType::READING
+                        ],
 
-                );
-            }
-
-
-
-
-            if (isset($reactionSummary) && $chapter->reacted($user)) {
-                foreach ($chapter->reactions as $reaction) {
-                    $responder = $reaction->getResponder();
-                    if ($responder->id === $user->id) {
-                        $userReaction = $reaction;
-                    }
-                };
+                    );
             }
         }
 
+
+
+        // $userReaction = null;
+        // $reactionSummary = $chapter?->getReactionsSummary();
+        //     if (isset($reactionSummary) && $chapter->reacted($user)) {
+        //         foreach ($chapter->reactions as $reaction) {
+        //             $responder = $reaction->getResponder();
+        //             if ($responder->id === $user->id) {
+        //                 $userReaction = $reaction;
+        //             }
+        //         };
+        //     }
+        // }
+        // $chapter['reaction'] = [
+        //     'user' => $userReaction,
+        //     'summary' => $reactionSummary
+        // ];
+
         return $this->success([
-            'data' => [
-                "chapter" => $chapter,
-                "countChapter" => $countChapter,
-                "reaction" => [
-                    'user' => $userReaction,
-                    'summary' => $reactionSummary
-                ],
-
-            ]
-
-
+            'data' => $chapter,
         ]);
     }
 
